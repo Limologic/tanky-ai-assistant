@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Tanky AI Assistant</title>
+    <style>
+      body { font-family: sans-serif; background: #F2E8D5; }
+      #chat { max-width: 600px; margin: 60px auto; background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+      .msg { margin: 10px 0; padding: 10px 14px; border-radius: 8px; }
+      .user { background: #57DFA6; color: #fff; text-align: right; }
+      .bot { background: #EC7251; color: #fff; text-align: left; }
+      #input { display: flex; gap: 10px; margin-top: 10px; }
+      #input input { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #ccc; }
+      #input button { background: #42486F; color: #fff; border: none; border-radius: 8px; padding: 10px 16px; cursor: pointer; }
+    </style>
+  </head>
+  <body>
+    <div id="chat">
+      <h2>💬 Talk to Tanky</h2>
+      <div id="messages"></div>
+      <div id="input">
+        <input id="text" placeholder="Ask Tanky..." />
+        <button onclick="sendMessage()">Send</button>
+      </div>
+    </div>
+
+    <script>
+      async function sendMessage() {
+        const input = document.getElementById("text");
+        const text = input.value.trim();
+        if (!text) return;
+
+        const messagesDiv = document.getElementById("messages");
+        messagesDiv.innerHTML += `<div class='msg user'>${text}</div>`;
+        input.value = "";
+
+        const res = await fetch("/tanky-chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ messages: [{ role: "user", content: text }] })
+        });
+        const data = await res.json();
+        messagesDiv.innerHTML += `<div class='msg bot'>${data.reply.content}</div>`;
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+      }
+    </script>
+  </body>
+</html>
