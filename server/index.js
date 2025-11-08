@@ -57,17 +57,20 @@ function saveConversationJSON(userMsg, reply, lang, hasImage) {
     }
 
     // --- Send log to Google Sheets via webhook (Apps Script) ---
-    fetch("https://script.google.com/macros/s/AKfycbzX7NYKBPueLXErk7U7gnnLAGl0MWH6TtUK5k4IHfnBu-uUz4JclVSmWqL59t6pcHuTkw/exec", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        timestamp,
-        lang,
-        message: userMsg,
-        reply,
-        hasImage
-      })
-    }).catch(() => {});
+    fetch(
+      "https://script.google.com/macros/s/AKfycbzX7NYKBPueLXErk7U7gnnLAGl0MWH6TtUK5k4IHfnBu-uUz4JclVSmWqL59t6pcHuTkw/exec",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          timestamp,
+          lang,
+          message: userMsg,
+          reply,
+          hasImage
+        })
+      }
+    ).catch(() => {});
 
     // --- Save locally (keep last 5 only) ---
     history.unshift({ timestamp, lang, user: userMsg, hasImage, reply });
@@ -124,12 +127,12 @@ If an image is included, analyze it visually (fish species, water clarity, tank 
     const reply =
       completion.choices?.[0]?.message?.content?.trim() ||
       (hasImage
-        ? (isArabic
-            ? "لم أتمكن من تحليل الصورة حالياً. حاول مجدداً لاحقاً."
-            : "I couldn’t analyze the image right now. Please try again later.")
-        : (isArabic
-            ? "لم أتمكن من الرد حالياً. حاول مرة أخرى لاحقاً."
-            : "I couldn’t generate a response this time. Please try again."));
+        ? isArabic
+          ? "لم أتمكن من تحليل الصورة حالياً. حاول مجدداً لاحقاً."
+          : "I couldn’t analyze the image right now. Please try again later."
+        : isArabic
+        ? "لم أتمكن من الرد حالياً. حاول مرة أخرى لاحقاً."
+        : "I couldn’t generate a response this time. Please try again.");
 
     // === Logging ===
     logText(
@@ -174,4 +177,16 @@ app.get("/recent", (req, res) => {
     if (!fs.existsSync(file)) return res.json([]);
     const history = JSON.parse(fs.readFileSync(file, "utf8"));
     res.json(history);
- 
+  } catch (err) {
+    res.status(500).json({ error: "Error reading conversation history." });
+  }
+});
+
+// === Server start ===
+app.listen(3000, () => {
+  console.log("✅ Tanky API running on port 3000");
+  console.log(`🪶 Logs: ${mainLogFile}`);
+  console.log(
+    `💾 Recent chats: ${path.join(logsDir, "tanky_conversations.json")}`
+  );
+});
