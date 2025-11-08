@@ -37,10 +37,12 @@
       padding: 16px;
       overflow-y: auto;
       background: #fafafa;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
     }
 
     .msg {
-      margin: 8px 0;
       padding: 10px 14px;
       border-radius: 16px;
       max-width: 80%;
@@ -50,10 +52,11 @@
     }
 
     .user {
-      background: #e3f9f7;
+      background: #dff9f7;
       color: #0f172a;
       align-self: flex-end;
       border: 1px solid #bcebe8;
+      text-align: right;
     }
 
     .bot {
@@ -61,6 +64,7 @@
       color: #111827;
       align-self: flex-start;
       border: 1px solid #e0e0e0;
+      text-align: left;
     }
 
     #input {
@@ -150,7 +154,6 @@
       applyLang(lang);
     };
 
-    // Save & Load chat using LocalStorage
     function saveChat() {
       localStorage.setItem('tanky_chat', messagesDiv.innerHTML);
     }
@@ -191,7 +194,7 @@
       }
     });
 
-    // Enhanced message display with Markdown + save after append
+    //  Updated appendMsg with direction styling
     function appendMsg(text, cls) {
       const div = document.createElement('div');
       div.className = 'msg ' + cls;
@@ -201,7 +204,7 @@
       div.innerHTML = formatted;
       messagesDiv.appendChild(div);
       messagesDiv.scrollTop = messagesDiv.scrollHeight;
-      saveChat(); // save every message
+      saveChat();
     }
   </script>
 </body>
