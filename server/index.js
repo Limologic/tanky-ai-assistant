@@ -26,7 +26,6 @@ const completion = await client.chat.completions.create({
   max_completion_tokens: 400
 });
 
-// تأمين الرد في حالة رجع فاضي
 const reply =
   completion.choices?.[0]?.message?.content ||
   "I'm here, but I couldn’t generate a proper answer this time. Please try again!";
