@@ -55,30 +55,6 @@ async function saveConversationJSON(userMsg, reply, lang, hasImage) {
       history = JSON.parse(fs.readFileSync(file, "utf8"));
     }
 
-    // --- Send log to Google Sheets via webhook (Apps Script) ---
-    try {
-      const response = await fetch(
-        "https://script.google.com/macros/s/AKfycbzLAv1VcrJB2BvytjV-ElM6DvWYmoWH9_Qrthu5KdTzN_f1kJnnnG1bsyzdrUd6fOBL/exec",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          redirect: "follow", // Important to handle Google redirect
-          body: JSON.stringify({
-            timestamp,
-            lang,
-            message: userMsg,
-            reply,
-            hasImage
-          })
-        }
-      );
-
-      const text = await response.text();
-      console.log("📤 Google Sheet response:", text);
-    } catch (sheetErr) {
-      console.error("❌ Google Sheet webhook failed:", sheetErr.message);
-    }
-
     // --- Save locally (keep last 5 only) ---
     history.unshift({ timestamp, lang, user: userMsg, hasImage, reply });
     if (history.length > 5) history = history.slice(0, 5);
