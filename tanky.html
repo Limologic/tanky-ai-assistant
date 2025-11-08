@@ -32,6 +32,17 @@
       justify-content: space-between;
     }
 
+    #title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    #title img {
+      width: 28px;
+      height: 28px;
+    }
+
     #messages {
       flex: 1;
       padding: 16px;
@@ -42,7 +53,6 @@
       gap: 8px;
     }
 
-    /* Message bubbles */
     .msg {
       display: flex;
       align-items: flex-start;
@@ -55,7 +65,7 @@
       word-wrap: break-word;
     }
 
-    /* User messages */
+    /* ✅ User always right aligned */
     .user {
       background: #e2f9f7;
       color: #0f172a;
@@ -65,7 +75,7 @@
       justify-content: flex-end;
     }
 
-    /* Tanky (bot) messages */
+    /* 🤖 Tanky always left aligned */
     .bot {
       background: #f2f2f2;
       color: #111827;
@@ -75,7 +85,6 @@
       justify-content: flex-start;
     }
 
-    /* Tanky avatar */
     .bot img {
       width: 28px;
       height: 28px;
@@ -120,16 +129,20 @@
       font-size: 14px;
       font-weight: 600;
       cursor: pointer;
+      margin-right: 8px;
     }
   </style>
 </head>
 <body>
   <div id="chat">
     <div id="header">
-      <span id="title">Tanky – Your Aquarium AI Assistant 🐠</span>
+      <div id="title">
+        <img src="https://mytankscape.com/wp-content/uploads/2025/11/tanky.svg" alt="Tanky Logo">
+        <span>Tanky – Your Aquarium AI Assistant</span>
+      </div>
       <div>
-        <button id="clear">Clear</button>
         <button id="langBtn" style="background:none;border:none;color:#fff;font-weight:bold;cursor:pointer;">AR</button>
+        <button id="clear">Clear</button>
       </div>
     </div>
 
@@ -150,12 +163,12 @@
     let lang = document.documentElement.lang.startsWith('ar') ? 'ar' : 'en';
 
     const uiText = {
-      en: { title: "Tanky – Your Aquarium AI Assistant 🤖🐠", placeholder: "Ask Tanky about your fish tank...", send: "Send" },
-      ar: { title: "تانكي – مساعدك الذكي لهواية أسماك الزينة 🐠🤖", placeholder: "اسأل تانكي أي سؤال عن حوضك أو أسماكك...", send: "إرسال" }
+      en: { title: "Tanky – Your Aquarium AI Assistant", placeholder: "Ask Tanky about your fish tank...", send: "Send" },
+      ar: { title: "تانكي – مساعدك الذكي لهواية أسماك الزينة", placeholder: "اسأل تانكي أي سؤال عن حوضك أو أسماكك...", send: "إرسال" }
     };
 
     function applyLang(l) {
-      document.getElementById('title').textContent = uiText[l].title;
+      document.querySelector("#title span").textContent = uiText[l].title;
       input.placeholder = uiText[l].placeholder;
       sendBtn.textContent = uiText[l].send;
       langBtn.textContent = l === 'ar' ? 'EN' : 'AR';
@@ -168,7 +181,7 @@
       applyLang(lang);
     };
 
-    // LocalStorage
+    // LocalStorage handling
     function saveChat() {
       localStorage.setItem('tanky_chat', messagesDiv.innerHTML);
     }
@@ -209,7 +222,7 @@
       }
     });
 
-    // Append message with alignment and avatar
+    // Append messages
     function appendMsg(text, cls) {
       const wrapper = document.createElement('div');
       wrapper.className = 'msg ' + cls;
@@ -218,6 +231,9 @@
         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
         .replace(/\n/g, '<br>');
 
+      const content = document.createElement('div');
+      content.innerHTML = formatted;
+
       if (cls === 'bot') {
         const avatar = document.createElement('img');
         avatar.src = 'https://mytankscape.com/wp-content/uploads/2025/11/tanky.svg';
@@ -225,10 +241,7 @@
         wrapper.prepend(avatar);
       }
 
-      const content = document.createElement('div');
-      content.innerHTML = formatted;
       wrapper.appendChild(content);
-
       messagesDiv.appendChild(wrapper);
       messagesDiv.scrollTop = messagesDiv.scrollHeight;
       saveChat();
