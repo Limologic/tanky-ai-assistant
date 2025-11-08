@@ -121,6 +121,28 @@
       width: 26px; height: 26px; object-fit: contain; margin-top: 2px; flex-shrink: 0;
     }
 
+    /* ✅ Fix chat image sizing */
+    .msg-content img.chat-image {
+      max-width: 200px;
+      max-height: 200px;
+      width: auto;
+      height: auto;
+      border-radius: 10px;
+      object-fit: cover;
+      display: block;
+      margin-top: 6px;
+      margin-bottom: 4px;
+      border: 1px solid rgba(0,0,0,0.1);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+
+    @media (max-width: 600px) {
+      .msg-content img.chat-image {
+        max-width: 140px;
+        max-height: 140px;
+      }
+    }
+
     #quickActions {
       display: flex; gap: 8px; padding: 8px 10px;
       border-top: 1px solid #eee; background: var(--chat-bg);
@@ -197,8 +219,6 @@
     const quickActionsDiv = document.getElementById('quickActions');
 
     let lang = localStorage.getItem('tanky_lang') || 'en';
-
-    // --- Detect language from URL if exists ---
     const params = new URLSearchParams(window.location.search);
     if (params.has('lang')) {
       lang = params.get('lang');
@@ -264,11 +284,8 @@
 
     function loadChat() {
       const saved = localStorage.getItem('tanky_chat');
-      if (saved) {
-        messagesDiv.innerHTML = saved;
-      } else {
-        setTimeout(() => appendMsg(ui[lang].welcome, 'bot', true), 100);
-      }
+      if (saved) messagesDiv.innerHTML = saved;
+      else setTimeout(() => appendMsg(ui[lang].welcome, 'bot', true), 100);
     }
 
     function appendMsg(text, who, isWelcome=false) {
