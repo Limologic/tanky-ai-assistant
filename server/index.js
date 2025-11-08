@@ -13,34 +13,66 @@ const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
 
-// Path setup
+// === Path setup ===
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const logsDir = path.join(__dirname, "logs");
+const mainLogFile = path.join(logsDir, "tanky_logs.txt");
 
-// Static serving for frontend (tanky.html)
+// Ensure logs folder exists
+if (!fs.existsSync(logsDir)) fs.mkdirSync(logsDir, { recursive: true });
+
+// === Serve static frontend ===
 app.use(express.static(__dirname));
 app.use(express.static(path.join(__dirname, "../")));
 
-// --- Rate Limiter (anti spam)
+// === Rate limiter ===
 const limiter = rateLimit({
-  windowMs: 15 * 1000, // 15 seconds
+  windowMs: 15 * 1000,
   max: 5,
   message: { error: "Too many requests, please wait a few seconds." }
 });
 app.use("/tanky-chat", limiter);
 
-// --- Logs setup
-const logFilePath = path.join(__dirname, "tanky_logs.txt");
-function logConversation(entry) {
+// === Helper: Save text log ===
+function logText(entry) {
   try {
     const timestamp = new Date().toISOString();
-    fs.appendFileSync(logFilePath, `[${timestamp}] ${entry}\n`, "utf8");
+    fs.appendFileSync(mainLogFile, `[${timestamp}] ${entry}\n`, "utf8");
   } catch (err) {
-    console.error("Log error:", err.message);
+    console.error("Log write error:", err.message);
   }
 }
 
-// --- MAIN ENDPOINT ---
+// === Helper: Save structured conversation (last 5 only) ===
+function saveConversationJSON(userMsg, reply, lang, hasImage) {
+  try {
+    const timestamp = new Date().toISOString();
+    const file = path.join(logsDir, "tanky_conversations.json");
+    let history = [];
+
+    if (fs.existsSync(file)) {
+      history = JSON.parse(fs.readFileSync(file, "utf8"));
+    }
+
+    history.unshift({
+      timestamp,
+      lang,
+      user: userMsg,
+      hasImage,
+      reply
+    });
+
+    // Keep last 5 only
+    history = history.slice(0, 5);
+
+    fs.writeFileSync(file, JSON.stringify(history, null, 2), "utf8");
+  } catch (err) {
+    console.error("Failed to save JSON conversation:", err.message);
+  }
+}
+
+// === MAIN API ENDPOINT ===
 app.post("/tanky-chat", async (req, res) => {
   try {
     const { messages, image } = req.body;
@@ -54,15 +86,12 @@ app.post("/tanky-chat", async (req, res) => {
     const isArabic = /[\u0600-\u06FF]/.test(userMessage);
 
     const systemPrompt = `You are Tanky, a friendly aquarium assistant for MyTankScape.
-You always respond briefly, clearly, and practically.
-If the user's message is in Arabic, reply in Arabic.
-If it's in English, reply in English.
-If an image is attached, analyze it visually and describe what's seen — 
-identify fish species, water clarity, tank cleanliness, or visible issues.`;
+You always reply concisely, helpfully, and practically for aquarium hobbyists.
+If the user's message is Arabic, reply in Arabic.
+If English, reply in English.
+If an image is included, analyze it visually — describe fish species, water clarity, tank cleanliness, or visible issues.`;
 
-    const chatInput = [
-      { role: "system", content: systemPrompt },
-    ];
+    const chatInput = [{ role: "system", content: systemPrompt }];
 
     if (hasImage) {
       chatInput.push({
@@ -76,7 +105,7 @@ identify fish species, water clarity, tank cleanliness, or visible issues.`;
       chatInput.push({ role: "user", content: userMessage });
     }
 
-    // --- Call OpenAI ---
+    // === GPT CALL ===
     const completion = await client.chat.completions.create({
       model: "gpt-4o-mini",
       messages: chatInput,
@@ -87,45 +116,63 @@ identify fish species, water clarity, tank cleanliness, or visible issues.`;
       completion.choices?.[0]?.message?.content?.trim() ||
       (hasImage
         ? (isArabic
-            ? "لم أتمكن من تحليل الصورة حالياً، حاول مجدداً لاحقاً."
+            ? "لم أتمكن من تحليل الصورة حالياً. حاول مجدداً لاحقاً."
             : "I couldn’t analyze the image right now. Please try again later.")
         : (isArabic
-            ? "لم أتمكن من توليد رد حالياً. حاول مرة أخرى لاحقاً."
+            ? "لم أتمكن من الرد حالياً. حاول مرة أخرى لاحقاً."
             : "I couldn’t generate a response this time. Please try again."));
 
-    // --- Log Conversation
-    logConversation(
+    // === LOGGING ===
+    logText(
       `User (${isArabic ? "ar" : "en"}): ${userMessage}\n${
         hasImage ? "[+ image attached]" : ""
       }\nTanky: ${reply}\n--------------------------------------------------`
     );
 
+    saveConversationJSON(userMessage, reply, isArabic ? "ar" : "en", hasImage);
+
     res.json({ reply });
   } catch (err) {
     console.error("OpenAI Error:", err.message || err);
-    logConversation(`ERROR: ${err.message || err}`);
+    logText(`ERROR: ${err.message || err}`);
     res.status(500).json({ error: err.message || "Server error" });
   }
 });
 
-// --- Logs Viewer ---
+// === Read all text logs ===
 app.get("/logs", (req, res) => {
   const key = req.query.key;
   const secret = process.env.TANKY_LOG_KEY || "tanky123";
-  if (key !== secret) {
-    return res.status(403).json({ error: "Unauthorized" });
-  }
+  if (key !== secret) return res.status(403).json({ error: "Unauthorized" });
+
   try {
-    const data = fs.readFileSync(logFilePath, "utf8");
+    const data = fs.readFileSync(mainLogFile, "utf8");
     res.setHeader("Content-Type", "text/plain; charset=utf-8");
     res.send(data);
   } catch {
-    res.status(500).send("Error reading log file.");
+    res.status(500).send("Error reading text log file.");
   }
 });
 
-// --- Server ---
+// === Read last 5 conversations (JSON) ===
+app.get("/recent", (req, res) => {
+  const key = req.query.key;
+  const secret = process.env.TANKY_LOG_KEY || "tanky123";
+  if (key !== secret) return res.status(403).json({ error: "Unauthorized" });
+
+  try {
+    const file = path.join(logsDir, "tanky_conversations.json");
+    if (!fs.existsSync(file)) return res.json([]);
+    const history = JSON.parse(fs.readFileSync(file, "utf8"));
+    res.json(history);
+  } catch (err) {
+    res.status(500).json({ error: "Error reading conversation history." });
+  }
+});
+
+// === Server start ===
 app.listen(3000, () => {
   console.log("✅ Tanky API running on port 3000");
-  console.log(`🪶 Logs saved at: ${logFilePath}`);
+  console.log(`🪶 Logs: ${mainLogFile}`);
+  console.log(`💾 Recent chats: ${path.join(logsDir, "tanky_conversations.json")}`);
 });
