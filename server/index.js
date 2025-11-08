@@ -58,7 +58,7 @@ function saveConversationJSON(userMsg, reply, lang, hasImage) {
 
     // --- Send log to Google Sheets via webhook (Apps Script) ---
     fetch(
-      "https://script.google.com/macros/s/AKfycbzX7NYKBPueLXErk7U7gnnLAGl0MWH6TtUK5k4IHfnBu-uUz4JclVSmWqL59t6pcHuTkw/exec",
+      "https://script.google.com/macros/s/AKfycbyXwwkncR_g6ac6jaOQU5n7DCIwFlsYN_5bPa3ecWTvjRpBx83_UA9MceERIqUI0ePjiw/exec",
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
