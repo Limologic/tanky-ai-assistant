@@ -24,9 +24,6 @@ app.post("/tanky-chat", async (req, res) => {
       model: "gpt-5-nano",
       messages: chatMessages,
       max_completion_tokens: 250,
-      temperature: 0.4,
-      presence_penalty: 0.2,
-      frequency_penalty: 0.3
     });
 
     res.json({ reply: completion.choices[0].message });
