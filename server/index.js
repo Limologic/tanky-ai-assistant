@@ -58,7 +58,7 @@ async function saveConversationJSON(userMsg, reply, lang, hasImage) {
     // --- Send log to Google Sheets via webhook (Apps Script) ---
     try {
       const response = await fetch(
-        "https://script.google.com/macros/s/AKfycbyUd2hcOVpxl54eLfkRCVNdwmupQTvlST9nJBcM0IvUd83Ci4j3-c9wseiUWpBr5_KO9w/exec",
+        "https://script.google.com/macros/s/AKfycbxWyYiMjjEh-8gLnZQXMyEn7756dDmRRA3zz6bUOpGTV8hdCaHXFsMA6y-mYZB8OYOKhg/exec",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
