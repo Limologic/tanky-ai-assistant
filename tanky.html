@@ -1,138 +1,195 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>Tanky AI Assistant</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Cairo', sans-serif;
-      background: #F2E8D5;
-    }
+<meta charset="utf-8">
+<title>Tanky v2 – Aquarium AI Assistant</title>
+<style>
+  body {
+    margin: 0;
+    font-family: 'Cairo', sans-serif;
+    background: #F2E8D5;
+  }
 
-    #chat {
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-      max-width: 600px;
-      margin: auto;
-      background: #fff;
-      box-shadow: 0 0 16px rgba(0, 0, 0, 0.1);
-      border-radius: 8px;
-      overflow: hidden;
-    }
+  #chat {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    max-width: 600px;
+    margin: auto;
+    background: #fff;
+    box-shadow: 0 0 16px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    overflow: hidden;
+  }
 
-    #header {
-      background: linear-gradient(145deg, #2DBBB5, #57DFA6);
-      color: #fff;
-      padding: 14px;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
+  /* Header */
+  #header {
+    background: linear-gradient(145deg, #2DBBB5, #57DFA6);
+    color: #fff;
+    padding: 14px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
 
-    #title {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
+  #title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
 
-    #title img {
-      width: 28px;
-      height: 28px;
-    }
+  #title img {
+    width: 28px;
+    height: 28px;
+  }
 
-    #messages {
-      flex: 1;
-      padding: 16px;
-      overflow-y: auto;
-      background: #fafafa;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
+  /* Messages */
+  #messages {
+    flex: 1;
+    padding: 16px;
+    overflow-y: auto;
+    background: #fafafa;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
 
-    .msg {
-      display: flex;
-      align-items: flex-start;
-      gap: 8px;
-      max-width: 80%;
-      line-height: 1.6;
-      font-size: 15px;
-      border-radius: 14px;
-      padding: 10px 14px;
-      word-wrap: break-word;
-    }
+  .msg {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    max-width: 80%;
+    line-height: 1.6;
+    font-size: 15px;
+    border-radius: 18px;
+    padding: 10px 14px;
+    word-wrap: break-word;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  }
 
-    /* ✅ User always right aligned */
-    .user {
-      background: #e2f9f7;
-      color: #0f172a;
-      align-self: flex-end;
-      text-align: right;
-      border: 1px solid #bcebe8;
-      justify-content: flex-end;
-    }
+  .user {
+    background: linear-gradient(145deg,#e2f9f7,#d4f3ef);
+    color: #0f172a;
+    align-self: flex-end;
+    text-align: right;
+    border: 1px solid #bcebe8;
+  }
 
-    /* 🤖 Tanky always left aligned */
-    .bot {
-      background: #f2f2f2;
-      color: #111827;
-      align-self: flex-start;
-      border: 1px solid #e0e0e0;
-      text-align: left;
-      justify-content: flex-start;
-    }
+  .bot {
+    background: #f2f2f2;
+    color: #111827;
+    align-self: flex-start;
+    border: 1px solid #e0e0e0;
+  }
 
-    .bot img {
-      width: 28px;
-      height: 28px;
-      object-fit: contain;
-      margin-right: 6px;
-      margin-top: 2px;
-      flex-shrink: 0;
-    }
+  .bot img {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+    margin-right: 6px;
+    margin-top: 2px;
+    flex-shrink: 0;
+  }
 
-    #input {
-      display: flex;
-      border-top: 1px solid #ddd;
-      background: #fff;
-    }
+  /* Input section */
+  #input {
+    display: flex;
+    border-top: 1px solid #ddd;
+    background: #fff;
+  }
 
-    #input input {
-      flex: 1;
-      border: none;
-      padding: 14px;
-      font-size: 15px;
-      outline: none;
-    }
+  #input input {
+    flex: 1;
+    border: none;
+    padding: 14px;
+    font-size: 15px;
+    outline: none;
+  }
 
-    #input button {
-      background: #EC7251;
-      color: #fff;
-      border: none;
-      padding: 0 18px;
-      cursor: pointer;
-      font-weight: bold;
-      transition: background 0.2s;
-    }
+  #input button {
+    background: #EC7251;
+    color: #fff;
+    border: none;
+    padding: 0 18px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.2s;
+  }
 
-    #input button:hover {
-      background: #d85f43;
-    }
+  #input button:hover {
+    background: #d85f43;
+  }
 
-    #clear {
-      background: none;
-      border: none;
-      color: #fff;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      margin-right: 8px;
-    }
-  </style>
+  #clear {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-right: 8px;
+  }
+
+  /* Typing animation */
+  .typing {
+    align-self: flex-start;
+    background: #f2f2f2;
+    border-radius: 18px;
+    padding: 10px 16px;
+    color: #999;
+    font-size: 14px;
+    display: flex;
+    gap: 4px;
+  }
+
+  .dot {
+    width: 6px;
+    height: 6px;
+    background: #999;
+    border-radius: 50%;
+    animation: blink 1.4s infinite both;
+  }
+
+  .dot:nth-child(2){ animation-delay: .2s; }
+  .dot:nth-child(3){ animation-delay: .4s; }
+
+  @keyframes blink {
+    0%, 80%, 100% { opacity: 0; }
+    40% { opacity: 1; }
+  }
+
+  /* Quick actions */
+  #quickActions {
+    display: flex;
+    gap: 8px;
+    padding: 8px 16px;
+    border-top: 1px solid #eee;
+    background: #fafafa;
+    flex-wrap: wrap;
+  }
+
+  .quick-btn {
+    background: #e7f8f7;
+    border: 1px solid #bde9e7;
+    border-radius: 20px;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: 0.2s;
+  }
+
+  .quick-btn:hover {
+    background: #d6f1ee;
+  }
+
+  @media (max-width: 600px){
+    .msg { max-width: 90%; }
+    #chat { height: 100dvh; }
+  }
+</style>
 </head>
+
 <body>
   <div id="chat">
     <div id="header">
@@ -148,6 +205,13 @@
 
     <div id="messages"></div>
 
+    <div id="quickActions">
+      <div class="quick-btn">🐠 Best beginner fish</div>
+      <div class="quick-btn">💧 How to clean the tank</div>
+      <div class="quick-btn">🌿 Plant care</div>
+      <div class="quick-btn">🚰 Water change tips</div>
+    </div>
+
     <div id="input">
       <input id="text" placeholder="Ask Tanky about your fish tank..." />
       <button id="send">Send</button>
@@ -160,11 +224,22 @@
     const sendBtn = document.getElementById('send');
     const langBtn = document.getElementById('langBtn');
     const clearBtn = document.getElementById('clear');
+    const quickBtns = document.querySelectorAll('.quick-btn');
     let lang = document.documentElement.lang.startsWith('ar') ? 'ar' : 'en';
 
     const uiText = {
-      en: { title: "Tanky – Your Aquarium AI Assistant", placeholder: "Ask Tanky about your fish tank...", send: "Send" },
-      ar: { title: "تانكي – مساعدك الذكي لهواية أسماك الزينة", placeholder: "اسأل تانكي أي سؤال عن حوضك أو أسماكك...", send: "إرسال" }
+      en: {
+        title: "Tanky – Your Aquarium AI Assistant",
+        placeholder: "Ask Tanky about your fish tank...",
+        send: "Send",
+        welcome: "🐟 Hi! I'm Tanky, your aquarium assistant. Ask me about cleaning, fish types, or water quality 💧"
+      },
+      ar: {
+        title: "تانكي – مساعدك الذكي لهواية أسماك الزينة",
+        placeholder: "اسأل تانكي أي سؤال عن حوضك أو أسماكك...",
+        send: "إرسال",
+        welcome: "🐟 أهلاً! أنا تانكي، مساعدك الذكي لحوض السمك. اسألني عن  اي شئ تحتاجه يخص الهوايه و العنايه بالاسماك و التنظيف، أنواع الأسماك أو قياسات المياه 💧"
+      }
     };
 
     function applyLang(l) {
@@ -181,7 +256,6 @@
       applyLang(lang);
     };
 
-    // LocalStorage handling
     function saveChat() {
       localStorage.setItem('tanky_chat', messagesDiv.innerHTML);
     }
@@ -189,30 +263,44 @@
     function loadChat() {
       const saved = localStorage.getItem('tanky_chat');
       if (saved) messagesDiv.innerHTML = saved;
+      else appendMsg(uiText[lang].welcome, 'bot');
     }
 
     function clearChat() {
       messagesDiv.innerHTML = '';
       localStorage.removeItem('tanky_chat');
+      appendMsg(uiText[lang].welcome, 'bot');
     }
 
     clearBtn.onclick = clearChat;
     loadChat();
 
-    sendBtn.onclick = async () => {
+    async function handleMessage(text) {
+      appendMsg(text, 'user');
+      const typing = showTyping();
+
+      try {
+        const res = await fetch('https://tanky-ai-assistant.onrender.com/tanky-chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            messages: [{ role: 'user', content: text + (lang === 'ar' ? " (أجب بالعربية)" : " (Answer in English)") }]
+          })
+        });
+        const data = await res.json();
+        removeTyping(typing);
+        appendMsg(data.reply || '...', 'bot');
+      } catch (e) {
+        removeTyping(typing);
+        appendMsg("😅 Connection issue, please try again.", 'bot');
+      }
+    }
+
+    sendBtn.onclick = () => {
       const text = input.value.trim();
       if (!text) return;
       input.value = '';
-      appendMsg(text, 'user');
-      const res = await fetch('https://tanky-ai-assistant.onrender.com/tanky-chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          messages: [{ role: 'user', content: text + (lang === 'ar' ? " (أجب بالعربية)" : " (Answer in English)") }]
-        })
-      });
-      const data = await res.json();
-      appendMsg(data.reply || '...', 'bot');
+      handleMessage(text);
     };
 
     input.addEventListener("keypress", (e) => {
@@ -222,11 +310,13 @@
       }
     });
 
-    // Append messages
+    quickBtns.forEach(btn => {
+      btn.onclick = () => handleMessage(btn.textContent);
+    });
+
     function appendMsg(text, cls) {
       const wrapper = document.createElement('div');
       wrapper.className = 'msg ' + cls;
-
       const formatted = text
         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
         .replace(/\n/g, '<br>');
@@ -245,6 +335,19 @@
       messagesDiv.appendChild(wrapper);
       messagesDiv.scrollTop = messagesDiv.scrollHeight;
       saveChat();
+    }
+
+    function showTyping() {
+      const typing = document.createElement('div');
+      typing.className = 'typing';
+      typing.innerHTML = '<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
+      messagesDiv.appendChild(typing);
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+      return typing;
+    }
+
+    function removeTyping(el) {
+      if (el && el.parentNode) el.parentNode.removeChild(el);
     }
   </script>
 </body>
