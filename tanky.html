@@ -182,11 +182,20 @@
       border-radius: 999px; font-size: 14px; flex-shrink: 0;
     }
 
-    /* --- Fix message direction --- */
+/* Fix static message direction and alignment */
+#messages {
+  direction: ltr !important; /* Prevent parent flipping in RTL */
+}
+
+.msg {
+  direction: ltr !important;
+}
+
 .user {
   direction: rtl !important;
   text-align: right !important;
   align-self: flex-end !important;
+  justify-content: flex-end !important;
   flex-direction: row-reverse !important;
 }
 
@@ -194,6 +203,7 @@
   direction: ltr !important;
   text-align: left !important;
   align-self: flex-start !important;
+  justify-content: flex-start !important;
   flex-direction: row !important;
 }
 
