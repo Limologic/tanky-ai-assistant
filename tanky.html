@@ -20,22 +20,6 @@
       --quick-border: #bde9e7;
     }
 
-    body.dark {
-      --bg: #020817;
-      --chat-bg: #020817;
-      --header-grad-1: #111827;
-      --header-grad-2: #1f2937;
-      --user-bubble-1: #22c55e22;
-      --user-bubble-2: #22c55e11;
-      --user-border: #22c55e55;
-      --bot-bubble: #111827;
-      --bot-border: #111827;
-      --accent: #EC7251;
-      --text-main: #e5e7eb;
-      --quick-bg: #111827;
-      --quick-border: #374151;
-    }
-
     body {
       margin: 0;
       font-family: 'Cairo', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
@@ -80,13 +64,24 @@
       flex: 1; padding: 14px; overflow-y: auto;
       background: #fafafa; display: flex; flex-direction: column; gap: 10px;
     }
-    body.dark #messages { background: #020817; }
 
     .msg {
       display: flex; align-items: flex-start; gap: 8px;
       max-width: 80%; line-height: 1.6; font-size: 15px;
       border-radius: 18px; padding: 10px 14px; word-wrap: break-word;
       box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+      opacity: 1; transform: scale(1);
+      transition: all 0.4s ease;
+    }
+
+    .msg.fade-in {
+      opacity: 0; transform: scale(0.9);
+      animation: fadePop 0.5s ease-out forwards;
+    }
+
+    @keyframes fadePop {
+      from { opacity: 0; transform: translateY(10px) scale(0.95); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
     }
 
     .user {
@@ -102,26 +97,6 @@
     .bot img {
       width: 26px; height: 26px; object-fit: contain; margin-top: 2px; flex-shrink: 0;
     }
-
-    .msg-content img.chat-image {
-      max-width: 180px; border-radius: 10px; display: block; margin-top: 4px;
-    }
-
-    .typing {
-      align-self: flex-start; background: var(--bot-bubble);
-      border: 1px solid var(--bot-border); border-radius: 18px;
-      padding: 10px 14px; color: #9ca3af; font-size: 13px;
-      display: inline-flex; align-items: center; gap: 6px;
-    }
-
-    .dot {
-      width: 6px; height: 6px; background: #9ca3af;
-      border-radius: 50%; animation: blink 1.4s infinite both;
-    }
-
-    .dot:nth-child(2){ animation-delay: .2s; }
-    .dot:nth-child(3){ animation-delay: .4s; }
-    @keyframes blink { 0%, 80%, 100% { opacity: 0; } 40% { opacity: 1; } }
 
     #quickActions {
       display: flex; gap: 8px; padding: 8px 10px;
@@ -217,7 +192,7 @@
         clear: "Clear",
         welcome: "Hi! I'm <strong>Tanky</strong>, your smart aquarium assistant. I can help you balance water, choose the right fish, and fix tank issues — ask me anything!",
         quick: ["🐠 Best beginner fish", "New Aquarium setup tips", "🧽 Cleaning guide", "🌿 Easy plants"],
-        typing: "Tanky is Thinking...",
+        typing: "Tanky is thinking...",
         imageReceived: "📸 Got your image! Analyzing..."
       },
       ar: {
@@ -226,9 +201,9 @@
         send: "إرسال",
         langToggle: "EN",
         clear: "حذف",
-        welcome: "آهلا عزيزي الهاوي! أنا <strong>تانكي</strong>، مساعدك الذكي في الهواية. أقدر أساعدك في اختيار الأسماك المناسبة، توازن المياه، وتنظيف الحوض — اسألني أي حاجة!",
+        welcome: "أهلاً بك! أنا <strong>تانكي</strong>، مساعدك الذكي لعالم الأحواض. أقدر أساعدك في اختيار الأسماك المناسبة، توازن المياه، وتنظيف الحوض — اسألني أي حاجة!",
         quick: ["🐠 اقتراح نوع سمك", "💧 تحليل جودة المياه", "🧽 تنظيف الحوض", "🌿 نباتات سهلة"],
-        typing: "تانكي يبحث و يفكر...",
+        typing: "تانكي يفكر...",
         imageReceived: "📸 استلمت الصورة! جاري التحليل..."
       }
     };
@@ -260,15 +235,22 @@
     function saveChat() {
       localStorage.setItem('tanky_chat', messagesDiv.innerHTML);
     }
+
     function loadChat() {
       const saved = localStorage.getItem('tanky_chat');
-      if (saved) messagesDiv.innerHTML = saved;
-      else appendMsg(ui[lang].welcome, 'bot');
+      if (saved) {
+        messagesDiv.innerHTML = saved;
+      } else {
+        setTimeout(() => {
+          appendMsg(ui[lang].welcome, 'bot', true);
+        }, 100);
+      }
     }
+
     function clearChat() {
       messagesDiv.innerHTML = '';
       localStorage.removeItem('tanky_chat');
-      appendMsg(ui[lang].welcome, 'bot');
+      appendMsg(ui[lang].welcome, 'bot', true);
     }
 
     function showTyping() {
@@ -280,11 +262,12 @@
       messagesDiv.scrollTop = messagesDiv.scrollHeight;
       return wrap;
     }
+
     function removeTyping(el){ el?.remove(); }
 
-    function appendMsg(text, who) {
+    function appendMsg(text, who, isWelcome=false) {
       const wrap = document.createElement('div');
-      wrap.className = 'msg ' + who;
+      wrap.className = 'msg ' + who + (isWelcome ? ' fade-in' : '');
       const c = document.createElement('div');
       c.className = 'msg-content';
       const formatted = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
