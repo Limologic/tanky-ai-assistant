@@ -1,45 +1,53 @@
 import express from "express";
 import bodyParser from "body-parser";
 import OpenAI from "openai";
+import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 
 const app = express();
-app.use(bodyParser.json({ limit: "15mb" })); // لدعم الصور base64 لحد 15MB
+app.use(bodyParser.json({ limit: "15mb" }));
 
 const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
 
-// مسار التشغيل
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// تقديم الملفات الثابتة (زي tanky.html)
 app.use(express.static(__dirname));
 app.use(express.static(path.join(__dirname, "../")));
 
-// ✨ نقطة الاتصال الرئيسية مع دعم الصور
+const logFilePath = path.join(__dirname, "tanky_logs.txt");
+
+function logConversation(entry) {
+  try {
+    const timestamp = new Date().toISOString();
+    const logLine = `[${timestamp}] ${entry}\n`;
+    fs.appendFileSync(logFilePath, logLine, "utf8");
+  } catch (err) {
+    console.error("Failed to write log:", err.message);
+  }
+}
+
 app.post("/tanky-chat", async (req, res) => {
   try {
-    const { messages, image } = req.body;
+    const { messages, image, lang } = req.body;
 
-    // لو المستخدم بعت رسالة بس
     const userMessage =
       messages && messages.length
         ? messages[messages.length - 1].content
         : "Hello Tanky!";
 
-    // لو فيه صورة أُرسلت مع الرسالة
     const hasImage = !!image;
 
-    // إعداد الرسائل المرسلة للـAPI
+    const systemPrompt =
+      lang === "ar"
+        ? "أنت تانكي، مساعد ذكي من MyTankScape. أجب بالعربية بإجابات قصيرة وعملية لهواة أحواض الأسماك. إذا استقبلت صورة، حلّلها لتحديد نوع السمك أو حالة الماء."
+        : "You are Tanky, a friendly aquarium assistant for MyTankScape. Respond in English with short, practical answers for aquarium hobbyists. If an image is provided, analyze it for fish species, water clarity, or tank conditions.";
+
     const promptMessages = [
-      {
-        role: "system",
-        content:
-          "You are Tanky, a friendly aquarium assistant for MyTankScape. Respond in Arabic or English based on the user’s message. Give short, practical answers about fishkeeping, aquarium care, and tank setup. If an image is provided, analyze it visually to detect fish species, water clarity, or tank issues."
-      },
+      { role: "system", content: systemPrompt },
       {
         role: "user",
         content: hasImage
@@ -51,9 +59,8 @@ app.post("/tanky-chat", async (req, res) => {
       }
     ];
 
-    // استدعاء OpenAI API
     const completion = await client.chat.completions.create({
-      model: "gpt-4o-mini", // يدعم تحليل الصور
+      model: "gpt-4o-mini",
       messages: promptMessages,
       max_completion_tokens: 500
     });
@@ -61,17 +68,26 @@ app.post("/tanky-chat", async (req, res) => {
     const reply =
       completion.choices?.[0]?.message?.content?.trim() ||
       (hasImage
-        ? "📷 I received the image but couldn’t analyze it this time. Please try again."
-        : "I'm here, but I couldn’t generate a proper answer this time. Please try again!");
+        ? "I received the image but couldn’t analyze it this time. Please try again."
+        : "I'm here, but I couldn’t generate a proper answer this time. Please try again.");
+
+    logConversation(`
+User (${lang || "en"}):
+${userMessage}
+${hasImage ? "[+ image attached]" : ""}
+Tanky:
+${reply}
+--------------------------------------------------`);
 
     res.json({ reply });
   } catch (err) {
-    console.error("❌ OpenAI Error:", err.message || err);
+    console.error("OpenAI Error:", err.message || err);
+    logConversation(`ERROR: ${err.message || err}`);
     res.status(500).json({ error: err.message || "Server error" });
   }
 });
 
-// ✅ تشغيل الخادم
-app.listen(3000, () =>
-  console.log("✅ Tanky API running on port 3000 and ready for image analysis!")
-);
+app.listen(3000, () => {
+  console.log("Tanky API running on port 3000");
+  console.log(`Logs are saved at: ${logFilePath}`);
+});
