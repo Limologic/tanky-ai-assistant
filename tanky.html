@@ -197,6 +197,14 @@
     const quickActionsDiv = document.getElementById('quickActions');
 
     let lang = localStorage.getItem('tanky_lang') || 'en';
+
+    // --- Detect language from URL if exists ---
+    const params = new URLSearchParams(window.location.search);
+    if (params.has('lang')) {
+      lang = params.get('lang');
+      localStorage.setItem('tanky_lang', lang);
+    }
+
     let isDark = localStorage.getItem('tanky_theme') === 'dark';
     let isBusy = false;
 
@@ -207,9 +215,9 @@
         send: "Send",
         langToggle: "AR",
         clear: "Clear",
-        welcome: "🐟 Hi! I'm Tanky. Ask me about fish, plants, or cleaning tips!",
-        quick: ["🐠 Best beginner fish", "💧 Water change tips", "🧽 Cleaning guide", "🌿 Easy plants"],
-        typing: "Tanky is typing...",
+        welcome: "Hi! I'm <strong>Tanky</strong>, your smart aquarium assistant. I can help you balance water, choose the right fish, and fix tank issues — ask me anything!",
+        quick: ["🐠 Best beginner fish", "New Aquarium setup tips", "🧽 Cleaning guide", "🌿 Easy plants"],
+        typing: "Tanky is Thinking...",
         imageReceived: "📸 Got your image! Analyzing..."
       },
       ar: {
@@ -218,9 +226,9 @@
         send: "إرسال",
         langToggle: "EN",
         clear: "حذف",
-        welcome: "🐟 أهلاً! أنا تانكي. اسألني عن الأسماك، النباتات أو تنظيف الحوض!",
+        welcome: "آهلا عزيزي الهاوي! أنا <strong>تانكي</strong>، مساعدك الذكي في الهواية. أقدر أساعدك في اختيار الأسماك المناسبة، توازن المياه، وتنظيف الحوض — اسألني أي حاجة!",
         quick: ["🐠 اقتراح نوع سمك", "💧 تحليل جودة المياه", "🧽 تنظيف الحوض", "🌿 نباتات سهلة"],
-        typing: "تانكي يكتب...",
+        typing: "تانكي يبحث و يفكر...",
         imageReceived: "📸 استلمت الصورة! جاري التحليل..."
       }
     };
@@ -313,7 +321,7 @@
       const f=e.target.files[0]; if(!f)return;
       const reader=new FileReader();
       reader.onload=()=>{
-        appendMsg(`<div>${lang==='ar'?'صورة من الحوض:':'Photo from tank:'}</div><img src="${reader.result}" class="chat-image">`,'user');
+        appendMsg(`<div>${lang==='ar'?'صورة:':'Photo:'}</div><img src="${reader.result}" class="chat-image">`,'user');
         handleMessage('Analyze this image',reader.result);
       };
       reader.readAsDataURL(f);
