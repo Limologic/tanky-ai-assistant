@@ -23,7 +23,7 @@ app.post("/tanky-chat", async (req, res) => {
     const completion = await client.chat.completions.create({
       model: "gpt-5-nano",
       messages: chatMessages,
-      max_tokens: 250,
+      max_completion_tokens: 250,
       temperature: 0.4,
       presence_penalty: 0.2,
       frequency_penalty: 0.3
