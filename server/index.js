@@ -20,17 +20,17 @@ app.post("/tanky-chat", async (req, res) => {
     const { messages } = req.body;
     const chatMessages = [SYSTEM_PROMPT, ...messages];
 
-    const completion = await client.chat.completions.create({
-      model: "gpt-5-nano",
-      messages: chatMessages,
-      max_completion_tokens: 250,
-    });
-
-    res.json({ reply: completion.choices[0].message });
-  } catch (err) {
-    console.error("OpenAI Error:", err.message || err);
-    res.status(500).json({ error: err.message || "Server error" });
-  }
+const completion = await client.chat.completions.create({
+  model: "gpt-5-nano",
+  messages: chatMessages,
+  max_completion_tokens: 400
 });
+
+// تأمين الرد في حالة رجع فاضي
+const reply =
+  completion.choices?.[0]?.message?.content ||
+  "I'm here, but I couldn’t generate a proper answer this time. Please try again!";
+
+res.json({ reply });
 
 app.listen(3000, () => console.log("Tanky API running on port 3000"));
