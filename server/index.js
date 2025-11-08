@@ -56,7 +56,7 @@ function saveConversationJSON(userMsg, reply, lang, hasImage) {
       history = JSON.parse(fs.readFileSync(file, "utf8"));
     }
 
-    // --- Send log to Google Sheets via webhook (n8n / Make / Apps Script) ---
+    // --- Send log to Google Sheets via webhook (Apps Script) ---
     fetch("https://script.google.com/macros/s/AKfycbzX7NYKBPueLXErk7U7gnnLAGl0MWH6TtUK5k4IHfnBu-uUz4JclVSmWqL59t6pcHuTkw/exec", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
