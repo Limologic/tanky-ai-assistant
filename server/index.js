@@ -5,7 +5,7 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import rateLimit from "express-rate-limit";
-import fetch from "node-fetch"; // ✅ required for server-side webhook calls
+import fetch from "node-fetch"; // Required for Google Sheets webhook
 
 const app = express();
 app.use(bodyParser.json({ limit: "15mb" }));
@@ -27,7 +27,7 @@ if (!fs.existsSync(logsDir)) fs.mkdirSync(logsDir, { recursive: true });
 app.use(express.static(__dirname));
 app.use(express.static(path.join(__dirname, "../")));
 
-// === Rate limiter (5 requests / 15s per IP) ===
+// === Rate limiter ===
 const limiter = rateLimit({
   windowMs: 15 * 1000,
   max: 5,
@@ -35,7 +35,7 @@ const limiter = rateLimit({
 });
 app.use("/tanky-chat", limiter);
 
-// === Helper: Save text log ===
+// === Helper: Write text log ===
 function logText(entry) {
   try {
     const timestamp = new Date().toISOString();
@@ -75,18 +75,16 @@ function saveConversationJSON(userMsg, reply, lang, hasImage) {
     // --- Save locally (keep last 5 only) ---
     history.unshift({ timestamp, lang, user: userMsg, hasImage, reply });
     if (history.length > 5) history = history.slice(0, 5);
-
     fs.writeFileSync(file, JSON.stringify(history, null, 2), "utf8");
   } catch (err) {
     console.error("Failed to save JSON conversation:", err.message);
   }
 }
 
-// === MAIN API ENDPOINT ===
+// === MAIN CHAT ENDPOINT ===
 app.post("/tanky-chat", async (req, res) => {
   try {
     const { messages, image } = req.body;
-
     const userMessage =
       messages && messages.length
         ? messages[messages.length - 1].content
@@ -105,19 +103,24 @@ If an image is included, analyze it visually (fish species, water clarity, tank 
 
     const chatInput = [{ role: "system", content: systemPrompt }];
 
+    // ✅ Corrected image input for Base64 format
     if (hasImage) {
+      const base64data = image.replace(/^data:image\/[a-z]+;base64,/, "");
       chatInput.push({
         role: "user",
         content: [
           { type: "text", text: userMessage },
-          { type: "image_url", image_url: image }
+          {
+            type: "image_url",
+            image_url: { url: `data:image/png;base64,${base64data}` }
+          }
         ]
       });
     } else {
       chatInput.push({ role: "user", content: userMessage });
     }
 
-    // === GPT-4o call ===
+    // === GPT-4o-mini call ===
     const completion = await client.chat.completions.create({
       model: "gpt-4o-mini",
       messages: chatInput,
@@ -140,18 +143,21 @@ If an image is included, analyze it visually (fish species, water clarity, tank 
         hasImage ? "[+ image attached]" : ""
       }\nTanky: ${reply}\n--------------------------------------------------`
     );
-
     saveConversationJSON(userMessage, reply, isArabic ? "ar" : "en", hasImage);
 
     res.json({ reply });
   } catch (err) {
     console.error("OpenAI Error:", err.message || err);
     logText(`ERROR: ${err.message || err}`);
-    res.status(500).json({ error: err.message || "Server error" });
+    res.status(500).json({
+      error: err.message || "Server error",
+      reply:
+        "⚠️ There was an issue analyzing your message or image. Please try again shortly."
+    });
   }
 });
 
-// === Read all text logs ===
+// === Logs viewer ===
 app.get("/logs", (req, res) => {
   const key = req.query.key;
   const secret = process.env.TANKY_LOG_KEY || "tanky123";
@@ -166,7 +172,7 @@ app.get("/logs", (req, res) => {
   }
 });
 
-// === Read last 5 JSON conversations ===
+// === Recent JSON conversations ===
 app.get("/recent", (req, res) => {
   const key = req.query.key;
   const secret = process.env.TANKY_LOG_KEY || "tanky123";
@@ -182,11 +188,9 @@ app.get("/recent", (req, res) => {
   }
 });
 
-// === Server start ===
+// === Start server ===
 app.listen(3000, () => {
   console.log("✅ Tanky API running on port 3000");
   console.log(`🪶 Logs: ${mainLogFile}`);
-  console.log(
-    `💾 Recent chats: ${path.join(logsDir, "tanky_conversations.json")}`
-  );
+  console.log(`💾 Recent chats: ${path.join(logsDir, "tanky_conversations.json")}`);
 });
