@@ -90,15 +90,29 @@
     #input button:hover {
       background: #d85f43;
     }
+
+    #clear {
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
   <div id="chat">
     <div id="header">
       <span id="title">Tanky – Your Aquarium AI Assistant 🐠</span>
-      <button id="langBtn" style="background:none;border:none;color:#fff;font-weight:bold;cursor:pointer;">AR</button>
+      <div>
+        <button id="clear">Clear</button>
+        <button id="langBtn" style="background:none;border:none;color:#fff;font-weight:bold;cursor:pointer;">AR</button>
+      </div>
     </div>
+
     <div id="messages"></div>
+
     <div id="input">
       <input id="text" placeholder="Ask Tanky about your fish tank..." />
       <button id="send">Send</button>
@@ -110,12 +124,13 @@
     const input = document.getElementById('text');
     const sendBtn = document.getElementById('send');
     const langBtn = document.getElementById('langBtn');
+    const clearBtn = document.getElementById('clear');
     let lang = document.documentElement.lang.startsWith('ar') ? 'ar' : 'en';
 
     const uiText = {
-      en: { title: "Tanky – Your Aquarium AI Assistant 🤖 🐠", placeholder: "Ask Tanky about your fish tank...", send: "Send" },
+      en: { title: "Tanky – Your Aquarium AI Assistant 🤖🐠", placeholder: "Ask Tanky about your fish tank...", send: "Send" },
       ar: {
-        title: "تانكي – مساعدك الذكي لهواية أسماك الزينة 🤖 🐠",
+        title: "تانكي – مساعدك الذكي لهواية أسماك الزينة 🤖🐠",
         placeholder: "اسأل تانكي أي سؤال عن حوضك أو أسماكك...",
         send: "إرسال"
       }
@@ -134,6 +149,24 @@
       lang = lang === 'ar' ? 'en' : 'ar';
       applyLang(lang);
     };
+
+    // Save & Load chat using LocalStorage
+    function saveChat() {
+      localStorage.setItem('tanky_chat', messagesDiv.innerHTML);
+    }
+
+    function loadChat() {
+      const saved = localStorage.getItem('tanky_chat');
+      if (saved) messagesDiv.innerHTML = saved;
+    }
+
+    function clearChat() {
+      messagesDiv.innerHTML = '';
+      localStorage.removeItem('tanky_chat');
+    }
+
+    clearBtn.onclick = clearChat;
+    loadChat();
 
     sendBtn.onclick = async () => {
       const text = input.value.trim();
@@ -158,19 +191,17 @@
       }
     });
 
-    // ✅ Enhanced message rendering with Markdown & formatting
+    // Enhanced message display with Markdown + save after append
     function appendMsg(text, cls) {
       const div = document.createElement('div');
       div.className = 'msg ' + cls;
-
-      // Simple Markdown + line breaks
       const formatted = text
         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
         .replace(/\n/g, '<br>');
-
       div.innerHTML = formatted;
       messagesDiv.appendChild(div);
       messagesDiv.scrollTop = messagesDiv.scrollHeight;
+      saveChat(); // save every message
     }
   </script>
 </body>
