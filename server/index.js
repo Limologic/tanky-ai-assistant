@@ -14,12 +14,12 @@ app.post("/tanky-chat", async (req, res) => {
     const { messages } = req.body;
 
 const completion = await client.chat.completions.create({
-  model: "gpt-5-nano",               // ✅ أرخص وأسرع موديل
-  messages: chatMessages,            // بيشمل الرسائل السابقة
-  max_tokens: 250,                   // ⛔ أقصى طول للرد
-  temperature: 0.4,                  // استقرار أكتر وأقل تكلفة
-  presence_penalty: 0.2,             // يقلل الحشو
-  frequency_penalty: 0.3             // يمنع التكرار
+  model: "gpt-5-nano",
+  messages: chatMessages,
+  max_tokens: 250,
+  temperature: 0.4,
+  presence_penalty: 0.2,
+  frequency_penalty: 0.3
 });
         {
           role: "system",
