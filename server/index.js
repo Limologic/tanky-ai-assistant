@@ -18,16 +18,24 @@ const SYSTEM_PROMPT = {
 app.post("/tanky-chat", async (req, res) => {
   try {
     const { messages } = req.body;
-    const chatMessages = [SYSTEM_PROMPT, ...messages];
+
+    const userMessage =
+      messages && messages.length
+        ? messages[messages.length - 1].content
+        : "Hello Tanky!";
+
+    const prompt = `You are Tanky, a friendly aquarium assistant for MyTankScape.
+Answer clearly and helpfully in Arabic or English depending on the user message.
+Question: ${userMessage}`;
 
     const completion = await client.chat.completions.create({
       model: "gpt-5-nano",
-      messages: chatMessages,
+      messages: [{ role: "user", content: prompt }],
       max_completion_tokens: 400
     });
 
     const reply =
-      completion.choices?.[0]?.message?.content ||
+      completion.choices?.[0]?.message?.content?.trim() ||
       "I'm here, but I couldn’t generate a proper answer this time. Please try again!";
 
     res.json({ reply });
