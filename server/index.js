@@ -27,9 +27,9 @@ app.post("/tanky-chat", async (req, res) => {
     });
 
     res.json({ reply: completion.choices[0].message });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Server error" });
+    } catch (err) {
+    console.error("❌ OpenAI Error:", err.message || err);
+    res.status(500).json({ error: err.message || "Server error" });
   }
 });
 
