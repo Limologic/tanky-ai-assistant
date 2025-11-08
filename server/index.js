@@ -5,6 +5,7 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import rateLimit from "express-rate-limit";
+import fetch from "node-fetch"; // ✅ required for server-side webhook calls
 
 const app = express();
 app.use(bodyParser.json({ limit: "15mb" }));
@@ -22,11 +23,11 @@ const mainLogFile = path.join(logsDir, "tanky_logs.txt");
 // Ensure logs folder exists
 if (!fs.existsSync(logsDir)) fs.mkdirSync(logsDir, { recursive: true });
 
-// === Serve static frontend ===
+// === Serve static frontend (Tanky HTML) ===
 app.use(express.static(__dirname));
 app.use(express.static(path.join(__dirname, "../")));
 
-// === Rate limiter ===
+// === Rate limiter (5 requests / 15s per IP) ===
 const limiter = rateLimit({
   windowMs: 15 * 1000,
   max: 5,
@@ -55,16 +56,22 @@ function saveConversationJSON(userMsg, reply, lang, hasImage) {
       history = JSON.parse(fs.readFileSync(file, "utf8"));
     }
 
-    history.unshift({
-      timestamp,
-      lang,
-      user: userMsg,
-      hasImage,
-      reply
-    });
+    // --- Send log to Google Sheets via webhook (n8n / Make / Apps Script) ---
+    fetch("https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        timestamp,
+        lang,
+        message: userMsg,
+        reply,
+        hasImage
+      })
+    }).catch(() => {});
 
-    // Keep last 5 only
-    history = history.slice(0, 5);
+    // --- Save locally (keep last 5 only) ---
+    history.unshift({ timestamp, lang, user: userMsg, hasImage, reply });
+    if (history.length > 5) history = history.slice(0, 5);
 
     fs.writeFileSync(file, JSON.stringify(history, null, 2), "utf8");
   } catch (err) {
@@ -85,11 +92,13 @@ app.post("/tanky-chat", async (req, res) => {
     const hasImage = !!image;
     const isArabic = /[\u0600-\u06FF]/.test(userMessage);
 
-    const systemPrompt = `You are Tanky, a friendly aquarium assistant for MyTankScape.
-You always reply concisely, helpfully, and practically for aquarium hobbyists.
+    const systemPrompt = `
+You are Tanky, a friendly aquarium assistant for MyTankScape.
+Respond concisely, helpfully, and practically for aquarium hobbyists.
 If the user's message is Arabic, reply in Arabic.
-If English, reply in English.
-If an image is included, analyze it visually — describe fish species, water clarity, tank cleanliness, or visible issues.`;
+If it's English, reply in English.
+If an image is included, analyze it visually (fish species, water clarity, tank cleanliness, visible issues).
+`;
 
     const chatInput = [{ role: "system", content: systemPrompt }];
 
@@ -105,7 +114,7 @@ If an image is included, analyze it visually — describe fish species, water cl
       chatInput.push({ role: "user", content: userMessage });
     }
 
-    // === GPT CALL ===
+    // === GPT-4o call ===
     const completion = await client.chat.completions.create({
       model: "gpt-4o-mini",
       messages: chatInput,
@@ -122,7 +131,7 @@ If an image is included, analyze it visually — describe fish species, water cl
             ? "لم أتمكن من الرد حالياً. حاول مرة أخرى لاحقاً."
             : "I couldn’t generate a response this time. Please try again."));
 
-    // === LOGGING ===
+    // === Logging ===
     logText(
       `User (${isArabic ? "ar" : "en"}): ${userMessage}\n${
         hasImage ? "[+ image attached]" : ""
@@ -154,7 +163,7 @@ app.get("/logs", (req, res) => {
   }
 });
 
-// === Read last 5 conversations (JSON) ===
+// === Read last 5 JSON conversations ===
 app.get("/recent", (req, res) => {
   const key = req.query.key;
   const secret = process.env.TANKY_LOG_KEY || "tanky123";
@@ -165,14 +174,4 @@ app.get("/recent", (req, res) => {
     if (!fs.existsSync(file)) return res.json([]);
     const history = JSON.parse(fs.readFileSync(file, "utf8"));
     res.json(history);
-  } catch (err) {
-    res.status(500).json({ error: "Error reading conversation history." });
-  }
-});
-
-// === Server start ===
-app.listen(3000, () => {
-  console.log("✅ Tanky API running on port 3000");
-  console.log(`🪶 Logs: ${mainLogFile}`);
-  console.log(`💾 Recent chats: ${path.join(logsDir, "tanky_conversations.json")}`);
-});
+ 
