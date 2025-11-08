@@ -4,16 +4,92 @@
   <meta charset="utf-8">
   <title>Tanky AI Assistant</title>
   <style>
-    body { margin: 0; font-family: 'Cairo', sans-serif; background: #F2E8D5; }
-    #chat { display: flex; flex-direction: column; height: 100vh; max-width: 600px; margin: auto; background: #fff; box-shadow: 0 0 16px rgba(0,0,0,0.1); border-radius: 8px; overflow: hidden; }
-    #header { background: linear-gradient(145deg, #2DBBB5, #57DFA6); color: #fff; padding: 14px; font-weight: 700; display: flex; align-items: center; justify-content: space-between; }
-    #messages { flex: 1; padding: 14px; overflow-y: auto; }
-    .msg { margin: 8px 0; padding: 10px 14px; border-radius: 14px; max-width: 80%; word-wrap: break-word; }
-    .user { background: #57DFA6; color: #fff; align-self: flex-end; }
-    .bot { background: #42486F; color: #fff; align-self: flex-start; }
-    #input { display: flex; border-top: 1px solid #ddd; }
-    #input input { flex: 1; border: none; padding: 12px; font-size: 15px; }
-    #input button { background: #EC7251; color: #fff; border: none; padding: 12px 18px; cursor: pointer; font-weight: bold; }
+    body {
+      margin: 0;
+      font-family: 'Cairo', sans-serif;
+      background: #F2E8D5;
+    }
+
+    #chat {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      max-width: 600px;
+      margin: auto;
+      background: #fff;
+      box-shadow: 0 0 16px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    #header {
+      background: linear-gradient(145deg, #2DBBB5, #57DFA6);
+      color: #fff;
+      padding: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    #messages {
+      flex: 1;
+      padding: 16px;
+      overflow-y: auto;
+      background: #fafafa;
+    }
+
+    .msg {
+      margin: 8px 0;
+      padding: 10px 14px;
+      border-radius: 16px;
+      max-width: 80%;
+      word-wrap: break-word;
+      line-height: 1.6;
+      font-size: 15px;
+    }
+
+    .user {
+      background: #e3f9f7;
+      color: #0f172a;
+      align-self: flex-end;
+      border: 1px solid #bcebe8;
+    }
+
+    .bot {
+      background: #f2f2f2;
+      color: #111827;
+      align-self: flex-start;
+      border: 1px solid #e0e0e0;
+    }
+
+    #input {
+      display: flex;
+      border-top: 1px solid #ddd;
+      background: #fff;
+    }
+
+    #input input {
+      flex: 1;
+      border: none;
+      padding: 14px;
+      font-size: 15px;
+      outline: none;
+    }
+
+    #input button {
+      background: #EC7251;
+      color: #fff;
+      border: none;
+      padding: 0 18px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.2s;
+    }
+
+    #input button:hover {
+      background: #d85f43;
+    }
   </style>
 </head>
 <body>
@@ -37,10 +113,10 @@
     let lang = document.documentElement.lang.startsWith('ar') ? 'ar' : 'en';
 
     const uiText = {
-      en: { title: "Tanky – Your Aquarium AI Assistant 🐠", placeholder: "Ask Tanky about your fish tank...", send: "Send" },
-      ar: { 
-        title: "تانكي – مساعدك الذكي لهواية اسماك الزينة 🐟", 
-        placeholder: "اسأل تانكي أي سؤال عن حوضك أو أسماكك...", 
+      en: { title: "Tanky – Your Aquarium AI Assistant 🤖 🐠", placeholder: "Ask Tanky about your fish tank...", send: "Send" },
+      ar: {
+        title: "تانكي – مساعدك الذكي لهواية أسماك الزينة 🤖 🐠",
+        placeholder: "اسأل تانكي أي سؤال عن حوضك أو أسماكك...",
         send: "إرسال"
       }
     };
@@ -54,7 +130,10 @@
     }
 
     applyLang(lang);
-    langBtn.onclick = () => { lang = lang === 'ar' ? 'en' : 'ar'; applyLang(lang); };
+    langBtn.onclick = () => {
+      lang = lang === 'ar' ? 'en' : 'ar';
+      applyLang(lang);
+    };
 
     sendBtn.onclick = async () => {
       const text = input.value.trim();
@@ -79,10 +158,17 @@
       }
     });
 
+    // ✅ Enhanced message rendering with Markdown & formatting
     function appendMsg(text, cls) {
       const div = document.createElement('div');
       div.className = 'msg ' + cls;
-      div.textContent = text;
+
+      // Simple Markdown + line breaks
+      const formatted = text
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\n/g, '<br>');
+
+      div.innerHTML = formatted;
       messagesDiv.appendChild(div);
       messagesDiv.scrollTop = messagesDiv.scrollHeight;
     }
