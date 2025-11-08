@@ -20,7 +20,6 @@ const __dirname = path.dirname(__filename);
 const logsDir = path.join(__dirname, "logs");
 const mainLogFile = path.join(logsDir, "tanky_logs.txt");
 
-// Ensure logs folder exists
 if (!fs.existsSync(logsDir)) fs.mkdirSync(logsDir, { recursive: true });
 
 // === Serve static frontend (Tanky HTML) ===
@@ -45,8 +44,8 @@ function logText(entry) {
   }
 }
 
-// === Helper: Save structured conversation (last 5 only) ===
-function saveConversationJSON(userMsg, reply, lang, hasImage) {
+// === Helper: Save structured conversation (and push to Google Sheets) ===
+async function saveConversationJSON(userMsg, reply, lang, hasImage) {
   try {
     const timestamp = new Date().toISOString();
     const file = path.join(logsDir, "tanky_conversations.json");
@@ -57,20 +56,28 @@ function saveConversationJSON(userMsg, reply, lang, hasImage) {
     }
 
     // --- Send log to Google Sheets via webhook (Apps Script) ---
-    fetch(
-      "https://script.google.com/macros/s/AKfycbwvjleSDpa8FdLy52qnYAqk_ffTHwOOdUvfdmqlxZcgwbiFEVajQYjADQZpj3-EoOryyg/exec",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          timestamp,
-          lang,
-          message: userMsg,
-          reply,
-          hasImage
-        })
-      }
-    ).catch(() => {});
+    try {
+      const response = await fetch(
+        "https://script.google.com/macros/s/AKfycbwvjleSDpa8FdLy52qnYAqk_ffTHwOOdUvfdmqlxZcgwbiFEVajQYjADQZpj3-EoOryyg/exec",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          redirect: "follow", // Important to handle Google redirect
+          body: JSON.stringify({
+            timestamp,
+            lang,
+            message: userMsg,
+            reply,
+            hasImage
+          })
+        }
+      );
+
+      const text = await response.text();
+      console.log("📤 Google Sheet response:", text);
+    } catch (sheetErr) {
+      console.error("❌ Google Sheet webhook failed:", sheetErr.message);
+    }
 
     // --- Save locally (keep last 5 only) ---
     history.unshift({ timestamp, lang, user: userMsg, hasImage, reply });
@@ -103,7 +110,7 @@ If an image is included, analyze it visually (fish species, water clarity, tank 
 
     const chatInput = [{ role: "system", content: systemPrompt }];
 
-    // ✅ Corrected image input for Base64 format
+    // ✅ Properly format base64 image for GPT-4o-mini
     if (hasImage) {
       const base64data = image.replace(/^data:image\/[a-z]+;base64,/, "");
       chatInput.push({
@@ -120,7 +127,7 @@ If an image is included, analyze it visually (fish species, water clarity, tank 
       chatInput.push({ role: "user", content: userMessage });
     }
 
-    // === GPT-4o-mini call ===
+    // === GPT-4o-mini completion ===
     const completion = await client.chat.completions.create({
       model: "gpt-4o-mini",
       messages: chatInput,
@@ -143,7 +150,8 @@ If an image is included, analyze it visually (fish species, water clarity, tank 
         hasImage ? "[+ image attached]" : ""
       }\nTanky: ${reply}\n--------------------------------------------------`
     );
-    saveConversationJSON(userMessage, reply, isArabic ? "ar" : "en", hasImage);
+
+    await saveConversationJSON(userMessage, reply, isArabic ? "ar" : "en", hasImage);
 
     res.json({ reply });
   } catch (err) {
