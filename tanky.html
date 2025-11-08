@@ -55,7 +55,6 @@
       overflow: hidden;
     }
 
-    /* Header */
     #header {
       background: linear-gradient(145deg, var(--header-grad-1), var(--header-grad-2));
       color: #fff;
@@ -100,7 +99,6 @@
       background: rgba(255,255,255,0.12);
     }
 
-    /* Messages area */
     #messages {
       flex: 1;
       padding: 14px;
@@ -128,7 +126,6 @@
       box-shadow: 0 2px 4px rgba(0,0,0,0.04);
     }
 
-    /* User always right */
     .user {
       background: linear-gradient(145deg, var(--user-bubble-1), var(--user-bubble-2));
       color: var(--text-main);
@@ -136,10 +133,9 @@
       text-align: right;
       border: 1px solid var(--user-border);
       justify-content: flex-end;
-      flex-direction: row-reverse; /* text on left, bubble pinned right */
+      flex-direction: row-reverse;
     }
 
-    /* Tanky always left */
     .bot {
       background: var(--bot-bubble);
       color: var(--text-main);
@@ -147,7 +143,7 @@
       text-align: left;
       border: 1px solid var(--bot-border);
       justify-content: flex-start;
-      flex-direction: row; /* avatar left, text right */
+      flex-direction: row;
     }
 
     .bot img {
@@ -165,7 +161,6 @@
       margin-top: 4px;
     }
 
-    /* Typing indicator */
     .typing {
       align-self: flex-start;
       background: var(--bot-bubble);
@@ -195,7 +190,6 @@
       40% { opacity: 1; }
     }
 
-    /* Quick actions */
     #quickActions {
       display: flex;
       gap: 8px;
@@ -228,11 +222,6 @@
       background: #d6f1ee;
     }
 
-    body.dark .quick-btn:hover {
-      background: #111827;
-    }
-
-    /* Input bar */
     #inputBar {
       display: flex;
       align-items: center;
@@ -261,9 +250,7 @@
       color: #e5e7eb;
     }
 
-    #fileInput {
-      display: none;
-    }
+    #fileInput { display: none; }
 
     #text {
       flex: 1;
@@ -293,21 +280,12 @@
       transition: background 0.2s, transform 0.1s;
     }
 
-    #send:disabled {
-      opacity: 0.6;
-      cursor: default;
-      transform: none;
-    }
-
-    #send:hover:not(:disabled) {
-      background: #d85f43;
-      transform: translateY(-1px);
-    }
+    #send:disabled { opacity: 0.6; cursor: default; }
+    #send:hover:not(:disabled) { background: #d85f43; transform: translateY(-1px); }
 
     @media (max-width: 600px) {
       #chat { height: 100dvh; border-radius: 0; }
       .msg { max-width: 90%; font-size: 14px; }
-      #title span { font-size: 14px; }
     }
   </style>
 </head>
@@ -326,7 +304,6 @@
     </div>
 
     <div id="messages"></div>
-
     <div id="quickActions"></div>
 
     <div id="inputBar">
@@ -347,7 +324,7 @@
     const themeBtn = document.getElementById('themeBtn');
     const fileInput = document.getElementById('fileInput');
 
-    let lang = (localStorage.getItem('tanky_lang') || (document.documentElement.lang.startsWith('ar') ? 'ar' : 'en'));
+    let lang = localStorage.getItem('tanky_lang') || 'en';
     let isDark = localStorage.getItem('tanky_theme') === 'dark';
     let isBusy = false;
 
@@ -358,15 +335,10 @@
         send: "Send",
         langToggle: "AR",
         clear: "Clear",
-        welcome: "🐟 Hi! I'm Tanky, your aquarium assistant from MyTankScape. Ask me about cleaning, fish selection, plant care, or water quality 💧",
-        quick: [
-          "🐠 Best beginner fish",
-          "💧 Water change tips",
-          "🧽 How to clean the tank",
-          "🌿 Easy plants for beginners"
-        ],
+        welcome: "Hi! I'm Tanky, your aquarium assistant from MyTankScape.",
+        quick: ["Best beginner fish", "Water change tips", "How to clean the tank", "Easy plants for beginners"],
         typing: "Tanky is typing...",
-        imageReceived: "📷 Got your image! Soon I'll help you analyze tank conditions visually."
+        imageReceived: "Got your image! Soon I'll help you analyze tank conditions visually."
       },
       ar: {
         title: "تانكي – مساعدك الذكي لهواية أسماك الزينة",
@@ -374,22 +346,16 @@
         send: "إرسال",
         langToggle: "EN",
         clear: "حذف",
-        welcome: "🐟 أهلاً! أنا تانكي، مساعدك الذكي من MyTankScape. اسألني عن تنظيف الحوض، اختيار الأسماك، النباتات أو جودة المياه 💧",
-        quick: [
-          "🐠 اقتراح نوع سمك للمبتدئين",
-          "💧 نصائح تغيير مياه الحوض",
-          "🧽 طريقة تنظيف الحوض بدون ضرر",
-          "🌿 أفضل نباتات لحوض أسماك الزينة"
-        ],
+        welcome: "أهلاً! أنا تانكي، مساعدك الذكي من MyTankScape.",
+        quick: ["اقتراح نوع سمك للمبتدئين", "نصائح تغيير مياه الحوض", "طريقة تنظيف الحوض", "أفضل نباتات للحوض"],
         typing: "تانكي يكتب...",
-        imageReceived: "📷 استلمت الصورة! قريباً أقدر أساعدك في تحليل حالة الحوض بصرياً."
+        imageReceived: "استلمت الصورة! سأحللها قريباً."
       }
     };
 
     function applyTheme() {
       document.body.classList.toggle('dark', isDark);
       themeBtn.textContent = isDark ? '☀️' : '🌙';
-      saveChat(); // re-save so colors re-rendered on reload
     }
 
     function applyLang() {
@@ -411,44 +377,24 @@
         const btn = document.createElement('div');
         btn.className = 'quick-btn';
         btn.textContent = q;
-        btn.onclick = () => {
-          if (!isBusy) handleMessage(q);
-        };
+        btn.onclick = () => { if (!isBusy) handleMessage(q); };
         quickActionsDiv.appendChild(btn);
       });
     }
 
     function saveChat() {
       localStorage.setItem('tanky_chat_html', messagesDiv.innerHTML);
-      localStorage.setItem('tanky_chat_updated', Date.now().toString());
     }
 
     function loadChat() {
       const saved = localStorage.getItem('tanky_chat_html');
-      const updated = localStorage.getItem('tanky_chat_updated');
-      if (saved) {
-        messagesDiv.innerHTML = saved;
-        // optional: show small "resumed" note
-        if (updated) {
-          const diffMin = Math.round((Date.now() - Number(updated)) / 60000);
-          if (diffMin > 0) {
-            appendMsg(
-              (lang === 'ar'
-                ? `👋 مرحباً من جديد! استكملنا محادثتك السابقة (منذ ${diffMin} دقيقة تقريباً).`
-                : `👋 Welcome back! Resuming your previous chat from about ${diffMin} minute(s) ago.`),
-              'bot'
-            );
-          }
-        }
-      } else {
-        appendMsg(ui[lang].welcome, 'bot');
-      }
+      if (saved) messagesDiv.innerHTML = saved;
+      else appendMsg(ui[lang].welcome, 'bot');
     }
 
     function clearChat() {
       messagesDiv.innerHTML = "";
       localStorage.removeItem('tanky_chat_html');
-      localStorage.removeItem('tanky_chat_updated');
       appendMsg(ui[lang].welcome, 'bot');
     }
 
@@ -462,32 +408,22 @@
       return wrap;
     }
 
-    function removeTyping(el) {
-      if (el && el.parentNode) el.parentNode.removeChild(el);
-    }
+    function removeTyping(el) { if (el && el.parentNode) el.parentNode.removeChild(el); }
 
     function appendMsg(text, who) {
       const wrapper = document.createElement('div');
       wrapper.className = 'msg ' + who;
-
       const content = document.createElement('div');
       content.className = 'msg-content';
-
-      const formatted = (text || '')
-        .toString()
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-        .replace(/\n/g, '<br>');
-
+      const formatted = (text || '').toString().replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
       if (who === 'bot') {
         const avatar = document.createElement('img');
         avatar.src = 'https://mytankscape.com/wp-content/uploads/2025/11/tanky.svg';
         avatar.alt = 'Tanky';
         wrapper.appendChild(avatar);
       }
-
       content.innerHTML = formatted;
       wrapper.appendChild(content);
-
       messagesDiv.appendChild(wrapper);
       messagesDiv.scrollTop = messagesDiv.scrollHeight;
       saveChat();
@@ -497,10 +433,7 @@
       if (!text || isBusy) return;
       isBusy = true;
       sendBtn.disabled = true;
-
-      // user message
       appendMsg(text, 'user');
-
       const typingEl = showTyping();
 
       try {
@@ -508,75 +441,42 @@
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            messages: [
-              {
-                role: 'user',
-                content: text + (lang === 'ar'
-                  ? " (أجب بالعربية إن أمكن، وباختصار عملي لهواة الأحواض)"
-                  : " (Answer in English, concise and practical for aquarium hobbyists)")
-              }
-            ]
+            messages: [{ role: 'user', content: text }],
+            lang
           })
         });
-
         const data = await res.json();
         removeTyping(typingEl);
-
-        if (data && (data.reply || data.reply === "")) {
-          appendMsg(data.reply || "...", 'bot');
-        } else {
-          appendMsg(
-            lang === 'ar'
-              ? "😅 في مشكلة في الرد حالياً، جرّب تاني بعد لحظات."
-              : "😅 I had trouble getting a reply. Please try again in a moment.",
-            'bot'
-          );
-        }
-      } catch (err) {
-        console.error(err);
+        appendMsg(data.reply || "...", 'bot');
+      } catch {
         removeTyping(typingEl);
-        appendMsg(
-          lang === 'ar'
-            ? "😅 حصل خطأ في الاتصال. تأكد من الإنترنت وحاول مرة أخرى."
-            : "😅 Connection error. Please check your network and try again.",
-          'bot'
-        );
+        appendMsg(lang === 'ar' ? "حدث خطأ في الاتصال." : "Connection error.", 'bot');
       } finally {
         isBusy = false;
         sendBtn.disabled = false;
       }
     }
 
-    // Image upload: preview only (safe & future-proof)
-    fileInput.addEventListener('change', (e) => {
+    fileInput.addEventListener('change', e => {
       const file = e.target.files[0];
       if (!file) return;
       const reader = new FileReader();
       reader.onload = () => {
-        // show image as user message
         const wrapper = document.createElement('div');
         wrapper.className = 'msg user';
-
         const content = document.createElement('div');
         content.className = 'msg-content';
-        content.innerHTML = `
-          <div>${lang === 'ar' ? 'صورة من حوضي:' : 'Photo from my tank:'}</div>
-          <img src="${reader.result}" class="chat-image" alt="Uploaded tank image">
-        `;
+        content.innerHTML = `<div>${lang === 'ar' ? 'صورة من الحوض:' : 'Photo from tank:'}</div><img src="${reader.result}" class="chat-image" alt="Uploaded">`;
         wrapper.appendChild(content);
         messagesDiv.appendChild(wrapper);
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
         saveChat();
-
-        // bot acknowledgement (no heavy vision yet)
         appendMsg(ui[lang].imageReceived, 'bot');
       };
       reader.readAsDataURL(file);
-      // reset input so same file can be picked again later
       e.target.value = "";
     });
 
-    // Event bindings
     sendBtn.addEventListener('click', () => {
       const text = input.value.trim();
       if (!text) return;
@@ -584,32 +484,23 @@
       handleMessage(text);
     });
 
-    input.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        sendBtn.click();
-      }
+    input.addEventListener('keypress', e => {
+      if (e.key === 'Enter') { e.preventDefault(); sendBtn.click(); }
     });
 
     langBtn.addEventListener('click', () => {
       lang = lang === 'ar' ? 'en' : 'ar';
-      applyLang();
-      saveChat();
+      applyLang(); saveChat();
     });
 
     clearBtn.addEventListener('click', clearChat);
-
     themeBtn.addEventListener('click', () => {
       isDark = !isDark;
       localStorage.setItem('tanky_theme', isDark ? 'dark' : 'light');
       applyTheme();
     });
 
-    // Init
-    applyTheme();
-    applyLang();
-    buildQuickActions();
-    loadChat();
+    applyTheme(); applyLang(); buildQuickActions(); loadChat();
   </script>
 </body>
 </html>
