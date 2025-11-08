@@ -4,6 +4,7 @@ import OpenAI from "openai";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import rateLimit from "express-rate-limit";
 
 const app = express();
 app.use(bodyParser.json({ limit: "15mb" }));
@@ -12,14 +13,26 @@ const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
 
+// Resolve path
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Serve static (for tanky.html etc.)
 app.use(express.static(__dirname));
 app.use(express.static(path.join(__dirname, "../")));
 
+// Rate limiter (5 requests per 15 seconds per IP)
+const limiter = rateLimit({
+  windowMs: 15 * 1000,
+  max: 5,
+  message: { error: "Too many requests, please wait a few seconds." }
+});
+app.use("/tanky-chat", limiter);
+
+// Logs file
 const logFilePath = path.join(__dirname, "tanky_logs.txt");
 
+// Helper: append conversation
 function logConversation(entry) {
   try {
     const timestamp = new Date().toISOString();
@@ -30,6 +43,7 @@ function logConversation(entry) {
   }
 }
 
+// --- MAIN CHAT ENDPOINT ---
 app.post("/tanky-chat", async (req, res) => {
   try {
     const { messages, image, lang } = req.body;
@@ -43,41 +57,40 @@ app.post("/tanky-chat", async (req, res) => {
 
     const systemPrompt =
       lang === "ar"
-        ? "أنت تانكي، مساعد ذكي من MyTankScape. أجب بالعربية بإجابات قصيرة وعملية لهواة أحواض الأسماك. إذا استقبلت صورة، حلّلها لتحديد نوع السمك أو حالة الماء."
-        : "You are Tanky, a friendly aquarium assistant for MyTankScape. Respond in English with short, practical answers for aquarium hobbyists. If an image is provided, analyze it for fish species, water clarity, or tank conditions.";
+        ? "أنت تانكي، مساعد ذكي من MyTankScape. أجب بالعربية بإجابات قصيرة وعملية لهواة أحواض الأسماك. إذا أُرسلت صورة، حللها لتحديد نوع السمك أو حالة الماء أو نظافة الحوض."
+        : "You are Tanky, a friendly aquarium assistant for MyTankScape. Respond in English with concise, practical answers for aquarium hobbyists. If an image is included, analyze it for fish species, water clarity, or tank cleanliness.";
 
-    const promptMessages = [
+    const chatInput = [
       { role: "system", content: systemPrompt },
-      {
-        role: "user",
-        content: hasImage
-          ? [
+      hasImage
+        ? {
+            role: "user",
+            content: [
               { type: "text", text: userMessage },
               { type: "image_url", image_url: image }
             ]
-          : userMessage
-      }
+          }
+        : { role: "user", content: userMessage }
     ];
 
     const completion = await client.chat.completions.create({
       model: "gpt-4o-mini",
-      messages: promptMessages,
+      messages: chatInput,
       max_completion_tokens: 500
     });
 
     const reply =
       completion.choices?.[0]?.message?.content?.trim() ||
       (hasImage
-        ? "I received the image but couldn’t analyze it this time. Please try again."
+        ? "I received your image but couldn’t analyze it this time. Please try again."
         : "I'm here, but I couldn’t generate a proper answer this time. Please try again.");
 
-    logConversation(`
-User (${lang || "en"}):
-${userMessage}
-${hasImage ? "[+ image attached]" : ""}
-Tanky:
-${reply}
---------------------------------------------------`);
+    // Log to file
+    logConversation(
+      `User (${lang || "en"}):\n${userMessage}\n${
+        hasImage ? "[+ image attached]" : ""
+      }\nTanky:\n${reply}\n--------------------------------------------------`
+    );
 
     res.json({ reply });
   } catch (err) {
@@ -87,7 +100,24 @@ ${reply}
   }
 });
 
+// --- READ LOGS ENDPOINT ---
+app.get("/logs", (req, res) => {
+  const key = req.query.key;
+  const secret = process.env.TANKY_LOG_KEY || "tanky123";
+  if (key !== secret) {
+    return res.status(403).json({ error: "Unauthorized" });
+  }
+  try {
+    const data = fs.readFileSync(logFilePath, "utf8");
+    res.setHeader("Content-Type", "text/plain; charset=utf-8");
+    res.send(data);
+  } catch (err) {
+    res.status(500).send("Error reading log file.");
+  }
+});
+
+// Start server
 app.listen(3000, () => {
-  console.log("Tanky API running on port 3000");
-  console.log(`Logs are saved at: ${logFilePath}`);
+  console.log("✅ Tanky API running on port 3000");
+  console.log(`Logs at: ${logFilePath}`);
 });
