@@ -14,7 +14,15 @@ const SYSTEM_PROMPT = {
   content:
     "You are Tanky, a friendly aquarium assistant for MyTankScape. Respond in Arabic or English based on user input. Give short, practical answers about fishkeeping, aquarium gear, and water care."
 };
+import path from "path";
+import { fileURLToPath } from "url";
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Serve static files (like tanky.html)
+app.use(express.static(__dirname));
+app.use(express.static(path.join(__dirname, "../")));
 app.post("/tanky-chat", async (req, res) => {
   try {
     const { messages } = req.body;
