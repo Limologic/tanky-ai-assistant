@@ -66,226 +66,92 @@
       gap: 10px;
     }
 
-    #title {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 16px;
-    }
+    #title { display: flex; align-items: center; gap: 8px; font-size: 16px; }
+    #title img { width: 26px; height: 26px; }
 
-    #title img {
-      width: 26px;
-      height: 26px;
-    }
-
-    #header-actions {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 13px;
-    }
-
+    #header-actions { display: flex; align-items: center; gap: 8px; font-size: 13px; }
     #header-actions button {
-      background: transparent;
-      border: none;
-      color: #fff;
-      cursor: pointer;
-      font-weight: 600;
-      padding: 4px 6px;
-      border-radius: 6px;
+      background: transparent; border: none; color: #fff;
+      cursor: pointer; font-weight: 600; padding: 4px 6px; border-radius: 6px;
     }
-
-    #header-actions button:hover {
-      background: rgba(255,255,255,0.12);
-    }
+    #header-actions button:hover { background: rgba(255,255,255,0.12); }
 
     #messages {
-      flex: 1;
-      padding: 14px;
-      overflow-y: auto;
-      background: #fafafa;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
+      flex: 1; padding: 14px; overflow-y: auto;
+      background: #fafafa; display: flex; flex-direction: column; gap: 10px;
     }
-
-    body.dark #messages {
-      background: #020817;
-    }
+    body.dark #messages { background: #020817; }
 
     .msg {
-      display: flex;
-      align-items: flex-start;
-      gap: 8px;
-      max-width: 80%;
-      line-height: 1.6;
-      font-size: 15px;
-      border-radius: 18px;
-      padding: 10px 14px;
-      word-wrap: break-word;
+      display: flex; align-items: flex-start; gap: 8px;
+      max-width: 80%; line-height: 1.6; font-size: 15px;
+      border-radius: 18px; padding: 10px 14px; word-wrap: break-word;
       box-shadow: 0 2px 4px rgba(0,0,0,0.04);
     }
-
     .user {
       background: linear-gradient(145deg, var(--user-bubble-1), var(--user-bubble-2));
-      color: var(--text-main);
-      align-self: flex-end;
-      text-align: right;
-      border: 1px solid var(--user-border);
-      justify-content: flex-end;
-      flex-direction: row-reverse;
+      color: var(--text-main); align-self: flex-end; text-align: right;
+      border: 1px solid var(--user-border); flex-direction: row-reverse;
     }
-
     .bot {
-      background: var(--bot-bubble);
-      color: var(--text-main);
-      align-self: flex-start;
-      text-align: left;
-      border: 1px solid var(--bot-border);
-      justify-content: flex-start;
-      flex-direction: row;
+      background: var(--bot-bubble); color: var(--text-main);
+      align-self: flex-start; text-align: left; border: 1px solid var(--bot-border);
     }
-
     .bot img {
-      width: 26px;
-      height: 26px;
-      object-fit: contain;
-      margin-top: 2px;
-      flex-shrink: 0;
+      width: 26px; height: 26px; object-fit: contain; margin-top: 2px; flex-shrink: 0;
     }
-
     .msg-content img.chat-image {
-      max-width: 180px;
-      border-radius: 10px;
-      display: block;
-      margin-top: 4px;
+      max-width: 180px; border-radius: 10px; display: block; margin-top: 4px;
     }
 
     .typing {
-      align-self: flex-start;
-      background: var(--bot-bubble);
-      border: 1px solid var(--bot-border);
-      border-radius: 18px;
-      padding: 10px 14px;
-      color: #9ca3af;
-      font-size: 13px;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
+      align-self: flex-start; background: var(--bot-bubble);
+      border: 1px solid var(--bot-border); border-radius: 18px;
+      padding: 10px 14px; color: #9ca3af; font-size: 13px;
+      display: inline-flex; align-items: center; gap: 6px;
     }
-
     .dot {
-      width: 6px;
-      height: 6px;
-      background: #9ca3af;
-      border-radius: 50%;
-      animation: blink 1.4s infinite both;
+      width: 6px; height: 6px; background: #9ca3af;
+      border-radius: 50%; animation: blink 1.4s infinite both;
     }
-
     .dot:nth-child(2){ animation-delay: .2s; }
     .dot:nth-child(3){ animation-delay: .4s; }
-
-    @keyframes blink {
-      0%, 80%, 100% { opacity: 0; }
-      40% { opacity: 1; }
-    }
+    @keyframes blink { 0%, 80%, 100% { opacity: 0; } 40% { opacity: 1; } }
 
     #quickActions {
-      display: flex;
-      gap: 8px;
-      padding: 8px 10px;
-      border-top: 1px solid #eee;
-      background: #fafafa;
-      flex-wrap: nowrap;
-      overflow-x: auto;
+      display: flex; gap: 8px; padding: 8px 10px;
+      border-top: 1px solid #eee; background: #fafafa;
+      flex-wrap: nowrap; overflow-x: auto;
     }
-
-    body.dark #quickActions {
-      background: #020817;
-      border-color: #111827;
-    }
-
     .quick-btn {
-      background: var(--quick-bg);
-      border: 1px solid var(--quick-border);
-      border-radius: 20px;
-      padding: 6px 12px;
-      cursor: pointer;
-      font-size: 12px;
-      white-space: nowrap;
-      transition: 0.2s;
-      flex-shrink: 0;
+      background: var(--quick-bg); border: 1px solid var(--quick-border);
+      border-radius: 20px; padding: 6px 12px; cursor: pointer;
+      font-size: 12px; white-space: nowrap; transition: 0.2s; flex-shrink: 0;
       color: var(--text-main);
     }
 
-    .quick-btn:hover {
-      background: #d6f1ee;
-    }
-
     #inputBar {
-      display: flex;
-      align-items: center;
-      border-top: 1px solid #ddd;
-      background: var(--chat-bg);
-      padding: 6px 8px;
-      gap: 6px;
+      display: flex; align-items: center; border-top: 1px solid #ddd;
+      background: var(--chat-bg); padding: 6px 8px; gap: 6px;
     }
 
     #fileLabel {
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      border: none;
-      background: #e5e7eb;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-size: 16px;
-      flex-shrink: 0;
-    }
-
-    body.dark #fileLabel {
-      background: #111827;
-      color: #e5e7eb;
+      width: 30px; height: 30px; border-radius: 50%; border: none;
+      background: #e5e7eb; display: inline-flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 16px; flex-shrink: 0;
     }
 
     #fileInput { display: none; }
 
     #text {
-      flex: 1;
-      border: none;
-      padding: 10px;
-      font-size: 14px;
-      outline: none;
-      border-radius: 999px;
-      background: #f3f4f6;
-    }
-
-    body.dark #text {
-      background: #111827;
-      color: #e5e7eb;
+      flex: 1; border: none; padding: 10px; font-size: 14px;
+      outline: none; border-radius: 999px; background: #f3f4f6;
     }
 
     #send {
-      background: var(--accent);
-      color: #fff;
-      border: none;
-      padding: 9px 18px;
-      cursor: pointer;
-      font-weight: 700;
-      border-radius: 999px;
-      font-size: 14px;
-      flex-shrink: 0;
-      transition: background 0.2s, transform 0.1s;
-    }
-
-    #send:disabled { opacity: 0.6; cursor: default; }
-    #send:hover:not(:disabled) { background: #d85f43; transform: translateY(-1px); }
-
-    @media (max-width: 600px) {
-      #chat { height: 100dvh; border-radius: 0; }
-      .msg { max-width: 90%; font-size: 14px; }
+      background: var(--accent); color: #fff; border: none;
+      padding: 9px 18px; cursor: pointer; font-weight: 700;
+      border-radius: 999px; font-size: 14px; flex-shrink: 0;
     }
   </style>
 </head>
@@ -316,166 +182,56 @@
 
   <script>
     const messagesDiv = document.getElementById('messages');
-    const quickActionsDiv = document.getElementById('quickActions');
-    const input = document.getElementById('text');
     const sendBtn = document.getElementById('send');
-    const langBtn = document.getElementById('langBtn');
-    const clearBtn = document.getElementById('clearBtn');
-    const themeBtn = document.getElementById('themeBtn');
     const fileInput = document.getElementById('fileInput');
+    const input = document.getElementById('text');
 
-    let lang = localStorage.getItem('tanky_lang') || 'en';
-    let isDark = localStorage.getItem('tanky_theme') === 'dark';
-    let isBusy = false;
-
-    const ui = {
-      en: {
-        title: "Tanky – Your Aquarium AI Assistant",
-        placeholder: "Ask Tanky about your fish tank...",
-        send: "Send",
-        langToggle: "AR",
-        clear: "Clear",
-        welcome: "Hi! I'm Tanky, your aquarium assistant from MyTankScape.",
-        quick: ["Best beginner fish", "Water change tips", "How to clean the tank", "Easy plants for beginners"],
-        typing: "Tanky is typing...",
-        imageReceived: "Got your image! Soon I'll help you analyze tank conditions visually."
-      },
-      ar: {
-        title: "تانكي – مساعدك الذكي لهواية أسماك الزينة",
-        placeholder: "اسأل تانكي أي سؤال عن حوضك أو أسماكك...",
-        send: "إرسال",
-        langToggle: "EN",
-        clear: "حذف",
-        welcome: "أهلاً! أنا تانكي، مساعدك الذكي من MyTankScape.",
-        quick: ["اقتراح نوع سمك للمبتدئين", "نصائح تغيير مياه الحوض", "طريقة تنظيف الحوض", "أفضل نباتات للحوض"],
-        typing: "تانكي يكتب...",
-        imageReceived: "استلمت الصورة! سأحللها قريباً."
+    async function handleMessage(text, imageBase64 = null) {
+      appendMsg(text, 'user');
+      const typingEl = showTyping();
+      try {
+        const body = imageBase64
+          ? { messages: [{ role: 'user', content: text }], image: imageBase64 }
+          : { messages: [{ role: 'user', content: text }] };
+        const res = await fetch('https://tanky-ai-assistant.onrender.com/tanky-chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+        const data = await res.json();
+        removeTyping(typingEl);
+        appendMsg(data.reply || '...', 'bot');
+      } catch {
+        removeTyping(typingEl);
+        appendMsg('Connection error.', 'bot');
       }
-    };
-
-    function applyTheme() {
-      document.body.classList.toggle('dark', isDark);
-      themeBtn.textContent = isDark ? '☀️' : '🌙';
     }
-
-    function applyLang() {
-      const t = ui[lang];
-      document.querySelector('#title span').textContent = t.title;
-      input.placeholder = t.placeholder;
-      sendBtn.textContent = t.send;
-      langBtn.textContent = t.langToggle;
-      clearBtn.textContent = t.clear;
-      document.dir = lang === 'ar' ? 'rtl' : 'ltr';
-      buildQuickActions();
-      localStorage.setItem('tanky_lang', lang);
-    }
-
-    function buildQuickActions() {
-      const t = ui[lang];
-      quickActionsDiv.innerHTML = "";
-      t.quick.forEach(q => {
-        const btn = document.createElement('div');
-        btn.className = 'quick-btn';
-        btn.textContent = q;
-        btn.onclick = () => { if (!isBusy) handleMessage(q); };
-        quickActionsDiv.appendChild(btn);
-      });
-    }
-
-    function saveChat() {
-      localStorage.setItem('tanky_chat_html', messagesDiv.innerHTML);
-    }
-
-    function loadChat() {
-      const saved = localStorage.getItem('tanky_chat_html');
-      if (saved) messagesDiv.innerHTML = saved;
-      else appendMsg(ui[lang].welcome, 'bot');
-    }
-
-    function clearChat() {
-      messagesDiv.innerHTML = "";
-      localStorage.removeItem('tanky_chat_html');
-      appendMsg(ui[lang].welcome, 'bot');
-    }
-
-    function showTyping() {
-      const t = ui[lang];
-      const wrap = document.createElement('div');
-      wrap.className = 'typing';
-      wrap.innerHTML = `<span>${t.typing}</span><div class="dot"></div><div class="dot"></div><div class="dot"></div>`;
-      messagesDiv.appendChild(wrap);
-      messagesDiv.scrollTop = messagesDiv.scrollHeight;
-      return wrap;
-    }
-
-    function removeTyping(el) { if (el && el.parentNode) el.parentNode.removeChild(el); }
 
     function appendMsg(text, who) {
       const wrapper = document.createElement('div');
       wrapper.className = 'msg ' + who;
       const content = document.createElement('div');
       content.className = 'msg-content';
-      const formatted = (text || '').toString().replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
       if (who === 'bot') {
         const avatar = document.createElement('img');
         avatar.src = 'https://mytankscape.com/wp-content/uploads/2025/11/tanky.svg';
-        avatar.alt = 'Tanky';
         wrapper.appendChild(avatar);
       }
-      content.innerHTML = formatted;
+      content.innerHTML = text.replace(/\n/g, '<br>');
       wrapper.appendChild(content);
       messagesDiv.appendChild(wrapper);
       messagesDiv.scrollTop = messagesDiv.scrollHeight;
-      saveChat();
     }
 
-    async function handleMessage(text) {
-      if (!text || isBusy) return;
-      isBusy = true;
-      sendBtn.disabled = true;
-      appendMsg(text, 'user');
-      const typingEl = showTyping();
-
-      try {
-        const res = await fetch('https://tanky-ai-assistant.onrender.com/tanky-chat', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            messages: [{ role: 'user', content: text }],
-            lang
-          })
-        });
-        const data = await res.json();
-        removeTyping(typingEl);
-        appendMsg(data.reply || "...", 'bot');
-      } catch {
-        removeTyping(typingEl);
-        appendMsg(lang === 'ar' ? "حدث خطأ في الاتصال." : "Connection error.", 'bot');
-      } finally {
-        isBusy = false;
-        sendBtn.disabled = false;
-      }
+    function showTyping() {
+      const wrap = document.createElement('div');
+      wrap.className = 'typing';
+      wrap.innerHTML = `<span>Tanky is typing</span><div class="dot"></div><div class="dot"></div><div class="dot"></div>`;
+      messagesDiv.appendChild(wrap);
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+      return wrap;
     }
-
-    fileInput.addEventListener('change', e => {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = () => {
-        const wrapper = document.createElement('div');
-        wrapper.className = 'msg user';
-        const content = document.createElement('div');
-        content.className = 'msg-content';
-        content.innerHTML = `<div>${lang === 'ar' ? 'صورة من الحوض:' : 'Photo from tank:'}</div><img src="${reader.result}" class="chat-image" alt="Uploaded">`;
-        wrapper.appendChild(content);
-        messagesDiv.appendChild(wrapper);
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
-        saveChat();
-        appendMsg(ui[lang].imageReceived, 'bot');
-      };
-      reader.readAsDataURL(file);
-      e.target.value = "";
-    });
+    function removeTyping(el) { if (el) el.remove(); }
 
     sendBtn.addEventListener('click', () => {
       const text = input.value.trim();
@@ -484,23 +240,18 @@
       handleMessage(text);
     });
 
-    input.addEventListener('keypress', e => {
-      if (e.key === 'Enter') { e.preventDefault(); sendBtn.click(); }
+    fileInput.addEventListener('change', e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        const imgMsg = `<div>Photo uploaded:</div><img src="${reader.result}" class="chat-image">`;
+        appendMsg(imgMsg, 'user');
+        appendMsg('Analyzing the image...', 'bot');
+        handleMessage('Analyze this image.', reader.result);
+      };
+      reader.readAsDataURL(file);
     });
-
-    langBtn.addEventListener('click', () => {
-      lang = lang === 'ar' ? 'en' : 'ar';
-      applyLang(); saveChat();
-    });
-
-    clearBtn.addEventListener('click', clearChat);
-    themeBtn.addEventListener('click', () => {
-      isDark = !isDark;
-      localStorage.setItem('tanky_theme', isDark ? 'dark' : 'light');
-      applyTheme();
-    });
-
-    applyTheme(); applyLang(); buildQuickActions(); loadChat();
   </script>
 </body>
 </html>
