@@ -29,7 +29,7 @@ Answer clearly and helpfully in Arabic or English depending on the user message.
 Question: ${userMessage}`;
 
     const completion = await client.chat.completions.create({
-      model: "gpt-5-nano",
+      model: "gpt-4o-mini",
       messages: [{ role: "user", content: prompt }],
       max_completion_tokens: 400
     });
