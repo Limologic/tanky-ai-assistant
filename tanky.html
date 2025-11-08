@@ -42,29 +42,47 @@
       gap: 8px;
     }
 
+    /* Message bubbles */
     .msg {
-      padding: 10px 14px;
-      border-radius: 16px;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
       max-width: 80%;
-      word-wrap: break-word;
       line-height: 1.6;
       font-size: 15px;
+      border-radius: 14px;
+      padding: 10px 14px;
+      word-wrap: break-word;
     }
 
+    /* User messages */
     .user {
-      background: #dff9f7;
+      background: #e2f9f7;
       color: #0f172a;
       align-self: flex-end;
-      border: 1px solid #bcebe8;
       text-align: right;
+      border: 1px solid #bcebe8;
+      justify-content: flex-end;
     }
 
+    /* Tanky (bot) messages */
     .bot {
       background: #f2f2f2;
       color: #111827;
       align-self: flex-start;
       border: 1px solid #e0e0e0;
       text-align: left;
+      justify-content: flex-start;
+    }
+
+    /* Tanky avatar */
+    .bot img {
+      width: 28px;
+      height: 28px;
+      object-fit: contain;
+      margin-right: 6px;
+      margin-top: 2px;
+      flex-shrink: 0;
     }
 
     #input {
@@ -133,11 +151,7 @@
 
     const uiText = {
       en: { title: "Tanky – Your Aquarium AI Assistant 🤖🐠", placeholder: "Ask Tanky about your fish tank...", send: "Send" },
-      ar: {
-        title: "تانكي – مساعدك الذكي لهواية أسماك الزينة 🐠🤖",
-        placeholder: "اسأل تانكي أي سؤال عن حوضك أو أسماكك...",
-        send: "إرسال"
-      }
+      ar: { title: "تانكي – مساعدك الذكي لهواية أسماك الزينة 🐠🤖", placeholder: "اسأل تانكي أي سؤال عن حوضك أو أسماكك...", send: "إرسال" }
     };
 
     function applyLang(l) {
@@ -154,6 +168,7 @@
       applyLang(lang);
     };
 
+    // LocalStorage
     function saveChat() {
       localStorage.setItem('tanky_chat', messagesDiv.innerHTML);
     }
@@ -194,15 +209,27 @@
       }
     });
 
-    //  Updated appendMsg with direction styling
+    // Append message with alignment and avatar
     function appendMsg(text, cls) {
-      const div = document.createElement('div');
-      div.className = 'msg ' + cls;
+      const wrapper = document.createElement('div');
+      wrapper.className = 'msg ' + cls;
+
       const formatted = text
         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
         .replace(/\n/g, '<br>');
-      div.innerHTML = formatted;
-      messagesDiv.appendChild(div);
+
+      if (cls === 'bot') {
+        const avatar = document.createElement('img');
+        avatar.src = 'https://mytankscape.com/wp-content/uploads/2025/11/tanky.svg';
+        avatar.alt = 'Tanky';
+        wrapper.prepend(avatar);
+      }
+
+      const content = document.createElement('div');
+      content.innerHTML = formatted;
+      wrapper.appendChild(content);
+
+      messagesDiv.appendChild(wrapper);
       messagesDiv.scrollTop = messagesDiv.scrollHeight;
       saveChat();
     }
