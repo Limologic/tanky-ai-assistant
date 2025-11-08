@@ -13,9 +13,14 @@ app.post("/tanky-chat", async (req, res) => {
   try {
     const { messages } = req.body;
 
-    const completion = await client.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [
+const completion = await client.chat.completions.create({
+  model: "gpt-5-nano",               // ✅ أرخص وأسرع موديل
+  messages: chatMessages,            // بيشمل الرسائل السابقة
+  max_tokens: 250,                   // ⛔ أقصى طول للرد
+  temperature: 0.4,                  // استقرار أكتر وأقل تكلفة
+  presence_penalty: 0.2,             // يقلل الحشو
+  frequency_penalty: 0.3             // يمنع التكرار
+});
         {
           role: "system",
           content: "You are Tanky, a friendly aquarium assistant for MyTankScape. Respond in Arabic or English based on user input. Give short, practical answers about fishkeeping, aquarium gear, and water care."
