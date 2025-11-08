@@ -39,10 +39,10 @@
     const uiText = {
       en: { title: "Tanky – Your Aquarium AI Assistant 🐠", placeholder: "Ask Tanky about your fish tank...", send: "Send" },
       ar: { 
-  title: "تانكي – مساعدك الذكي لهواية أحواض السمك 🐟", 
-  placeholder: "اسأل تانكي أي سؤال عن حوضك أو أسماكك...", 
-  send: "إرسال"
-}
+        title: "تانكي – مساعدك الذكي لهواية اسماك الزينة 🐟", 
+        placeholder: "اسأل تانكي أي سؤال عن حوضك أو أسماكك...", 
+        send: "إرسال"
+      }
     };
 
     function applyLang(l) {
@@ -71,6 +71,13 @@
       const data = await res.json();
       appendMsg(data.reply || '...', 'bot');
     };
+
+    input.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        sendBtn.click();
+      }
+    });
 
     function appendMsg(text, cls) {
       const div = document.createElement('div');
