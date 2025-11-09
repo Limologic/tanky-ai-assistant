@@ -373,6 +373,23 @@
     applyTheme();
     applyLang();
     loadChat();
+
+  // --- Self Keep-Alive Ping for Render --- //
+const KEEP_ALIVE_URL = "https://tanky-ai-assistant.onrender.com/tanky-chat";
+
+// Ping every 10 minutes (600,000 ms)
+setInterval(() => {
+  fetch(KEEP_ALIVE_URL, { method: "GET" })
+    .then(() => console.log("✅ Tanky keep-alive ping sent"))
+    .catch(() => console.warn("⚠️ Keep-alive ping failed"));
+}, 600000); // 10 minutes
+
+// Also ping once immediately when the page fully loads
+window.addEventListener('load', () => {
+  fetch(KEEP_ALIVE_URL)
+    .then(() => console.log("🚀 Initial keep-alive ping sent"))
+    .catch(() => console.warn("⚠️ Initial keep-alive ping failed"));
+});
   </script>
 </body>
 </html>
