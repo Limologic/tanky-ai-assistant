@@ -36,17 +36,21 @@
       --quick-border: #334155;
     }
 
-    html, body {
-      width: 100%;
-      height: 100%;
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-      font-family: 'Cairo', system-ui, sans-serif;
-      background: var(--bg);
-      color: var(--text-main);
-      transition: background 0.4s ease, color 0.4s ease;
-    }
+html, body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  font-family: 'Cairo', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text-main);
+  transition: background 0.4s ease, color 0.4s ease;
+}
+
+:lang(en) {
+  font-family: 'Inter', system-ui, sans-serif;
+}
 
     #chat {
       position: fixed;
@@ -224,7 +228,43 @@
       font-size: 14px;
       flex-shrink: 0;
     }
+body.dark #text {
+  background: #1e293b;
+  color: #e5e7eb;
+}
+
+body.dark #fileLabel {
+  background: #1e293b;
+  color: #e5e7eb;
+}
+
+body.dark #inputBar {
+  border-top: 1px solid #1f2937;
+}
+    
   </style>
+
+  <style>
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #475569;
+  }
+  ::-webkit-scrollbar-track {
+    background: #0b1220;
+  }
+
+  ::selection {
+    background: #EC7251;
+    color: #fff;
+  }
+</style>
 </head>
 <body>
   <div id="chat">
@@ -262,7 +302,7 @@
     const quickActionsDiv = document.getElementById('quickActions');
 
     let lang = localStorage.getItem('tanky_lang') || 'ar';
-    let isDark = localStorage.getItem('tanky_theme') === 'dark';
+    let isDark = true; // force dark mode
     let isBusy = false;
 
     const ui = {
@@ -301,10 +341,9 @@
     }
 
     function applyTheme() {
-      document.body.classList.toggle('dark', isDark);
-      themeBtn.textContent = isDark ? '☀️' : '🌙';
-      localStorage.setItem('tanky_theme', isDark ? 'dark' : 'light');
-    }
+  document.body.classList.add('dark');
+  localStorage.setItem('tanky_theme', 'dark');
+}
 
     function applyLang() {
       const t = ui[lang];
@@ -368,7 +407,9 @@
     input.addEventListener('keypress', e => { if (e.key === 'Enter') { e.preventDefault(); sendBtn.click(); } });
     langBtn.onclick = () => { lang = lang === 'ar' ? 'en' : 'ar'; applyLang(); loadChat(); };
     clearBtn.onclick = () => { localStorage.removeItem('tanky_chat'); messagesDiv.innerHTML = ''; appendMsg(ui[lang].welcome, 'bot'); };
-    themeBtn.onclick = () => { isDark = !isDark; applyTheme(); };
+    themeBtn.style.display = 'none'; // hide theme toggle completely
+isDark = true;
+applyTheme();
 
     applyTheme();
     applyLang();
