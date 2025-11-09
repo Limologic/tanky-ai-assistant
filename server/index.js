@@ -171,10 +171,16 @@ app.get("/recent", (req, res) => {
     res.status(500).json({ error: "Error reading conversation history." });
   }
 });
-
+// Health check route for Render / UptimeRobot
+app.get("/tanky-chat", (req, res) => {
+  res.status(200).send("Tanky AI Assistant is alive 🐟");
+});
 // === Start server ===
 app.listen(3000, () => {
   console.log("✅ Tanky API running on port 3000");
   console.log(`🪶 Logs: ${mainLogFile}`);
   console.log(`💾 Recent chats: ${path.join(logsDir, "tanky_conversations.json")}`);
 });
+
+
+
