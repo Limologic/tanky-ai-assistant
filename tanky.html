@@ -36,21 +36,21 @@
       --quick-border: #334155;
     }
 
-html, body {
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  font-family: 'Cairo', system-ui, sans-serif;
-  background: var(--bg);
-  color: var(--text-main);
-  transition: background 0.4s ease, color 0.4s ease;
-}
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      font-family: 'Cairo', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text-main);
+      transition: background 0.4s ease, color 0.4s ease;
+    }
 
-:lang(en) {
-  font-family: 'Inter', system-ui, sans-serif;
-}
+    :lang(en) {
+      font-family: 'Inter', system-ui, sans-serif;
+    }
 
     #chat {
       position: fixed;
@@ -84,26 +84,6 @@ html, body {
 
     #title img { width: 26px; height: 26px; }
 
-    #header-actions {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 13px;
-    }
-
-    #header-actions button {
-      background: transparent;
-      border: none;
-      color: #fff;
-      cursor: pointer;
-      font-weight: 600;
-      padding: 4px 6px;
-      border-radius: 6px;
-      transition: background 0.3s ease;
-    }
-
-    #header-actions button:hover { background: rgba(255,255,255,0.12); }
-
     #messages {
       flex: 1;
       padding: 14px;
@@ -126,6 +106,13 @@ html, body {
       padding: 10px 14px;
       word-wrap: break-word;
       box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+      opacity: 0;
+      transform: translateY(4px);
+      animation: fadeIn 0.3s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      to { opacity: 1; transform: translateY(0); }
     }
 
     .msg.user {
@@ -150,121 +137,59 @@ html, body {
       flex-shrink: 0;
     }
 
-    .msg-content img.chat-image {
-      max-width: 160px;
-      max-height: 160px;
-      border-radius: 10px;
-      margin-top: 6px;
-      object-fit: cover;
-      display: block;
-    }
-
-    #quickActions {
-      display: flex;
-      gap: 8px;
-      padding: 8px 10px;
-      border-top: 1px solid #eee;
-      background: var(--chat-bg);
-      overflow-x: auto;
-      flex-shrink: 0;
-    }
-
-    .quick-btn {
-      background: var(--quick-bg);
-      border: 1px solid var(--quick-border);
-      border-radius: 20px;
-      padding: 6px 12px;
-      cursor: pointer;
-      font-size: 12px;
-      white-space: nowrap;
-      flex-shrink: 0;
-      transition: 0.2s;
-    }
-
-    #inputBar {
-      display: flex;
-      align-items: center;
-      border-top: 1px solid #ddd;
-      background: var(--chat-bg);
-      padding: 6px 8px;
-      gap: 6px;
-      flex-shrink: 0;
-    }
-
-    #fileLabel {
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      border: none;
-      background: #e5e7eb;
+    /* Typing animation */
+    .typing-dots {
       display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-size: 16px;
-      flex-shrink: 0;
+      gap: 4px;
+      font-size: 18px;
     }
 
-    #fileInput { display: none; }
-
-    #text {
-      flex: 1;
-      border: none;
-      padding: 10px;
-      font-size: 14px;
-      outline: none;
-      border-radius: 999px;
-      background: #f3f4f6;
+    .typing-dots span {
+      animation: blink 1.2s infinite ease-in-out;
     }
 
-    #send {
-      background: var(--accent);
+    .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes blink {
+      0%, 80%, 100% { opacity: 0.3; transform: translateY(0); }
+      40% { opacity: 1; transform: translateY(-3px); }
+    }
+
+    body.dark #text {
+      background: #1e293b;
+      color: #e5e7eb;
+    }
+
+    body.dark #fileLabel {
+      background: #1e293b;
+      color: #e5e7eb;
+    }
+
+    body.dark #inputBar {
+      border-top: 1px solid #1f2937;
+    }
+
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #475569;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0b1220;
+    }
+
+    ::selection {
+      background: #EC7251;
       color: #fff;
-      border: none;
-      padding: 9px 18px;
-      cursor: pointer;
-      font-weight: 700;
-      border-radius: 999px;
-      font-size: 14px;
-      flex-shrink: 0;
     }
-body.dark #text {
-  background: #1e293b;
-  color: #e5e7eb;
-}
-
-body.dark #fileLabel {
-  background: #1e293b;
-  color: #e5e7eb;
-}
-
-body.dark #inputBar {
-  border-top: 1px solid #1f2937;
-}
-    
   </style>
-
-  <style>
-  ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-  }
-  ::-webkit-scrollbar-thumb {
-    background: #334155;
-    border-radius: 4px;
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    background: #475569;
-  }
-  ::-webkit-scrollbar-track {
-    background: #0b1220;
-  }
-
-  ::selection {
-    background: #EC7251;
-    color: #fff;
-  }
-</style>
 </head>
 <body>
   <div id="chat">
@@ -276,7 +201,6 @@ body.dark #inputBar {
       <div id="header-actions">
         <button id="clearBtn">حذف</button>
         <button id="langBtn">EN</button>
-        <button id="themeBtn">🌙</button>
       </div>
     </div>
 
@@ -286,7 +210,7 @@ body.dark #inputBar {
     <div id="inputBar">
       <label id="fileLabel" for="fileInput">📎</label>
       <input id="fileInput" type="file" accept="image/*">
-      <input id="text" placeholder="اسأل تانكي" />
+      <input id="text" placeholder="اسأل تانكي..." />
       <button id="send">إرسال</button>
     </div>
   </div>
@@ -294,15 +218,19 @@ body.dark #inputBar {
   <script>
     const messagesDiv = document.getElementById('messages');
     const sendBtn = document.getElementById('send');
-    const fileInput = document.getElementById('fileInput');
     const input = document.getElementById('text');
     const langBtn = document.getElementById('langBtn');
     const clearBtn = document.getElementById('clearBtn');
-    const themeBtn = document.getElementById('themeBtn');
     const quickActionsDiv = document.getElementById('quickActions');
 
-    let lang = localStorage.getItem('tanky_lang') || 'ar';
-    let isDark = true; // force dark mode
+    // Auto-detect language on first visit
+    let lang = localStorage.getItem('tanky_lang');
+    if (!lang) {
+      lang = navigator.language.startsWith('ar') ? 'ar' : 'en';
+      localStorage.setItem('tanky_lang', lang);
+    }
+
+    let isDark = true;
     let isBusy = false;
 
     const ui = {
@@ -312,8 +240,8 @@ body.dark #inputBar {
         send: "إرسال",
         langToggle: "EN",
         clear: "حذف",
-        welcome: "أهلاً بك! أنا تانكي، مساعدك الذكي في عالم أسماك الزينةوالأحواض المزروعة والبحرية 🐠💧 أقدر أساعدك في اختيار الأسماك المناسبة، توازن المياه، حل المشاكل، و تنظيف الحوض. نبدأ بإيه؟",
-        quick: ["🐠 اقتراح نوع اكل سمك", "💧 تحليل جودة المياه", "🧽 تنظيف الحوض", "🌿 نباتات سهلة"]
+        welcome: "أهلاً بك! أنا تانكي، مساعدك الذكي في عالم أسماك الزينة والأحواض المزروعة والبحرية 🐠💧 نبدأ بإيه؟",
+        quick: ["🐠 اقتراح نوع أكل سمك", "💧 تحليل جودة المياه", "🧽 تنظيف الحوض", "🌿 نباتات سهلة"]
       },
       en: {
         title: "Tanky – Your Aquarium AI Assistant",
@@ -321,7 +249,7 @@ body.dark #inputBar {
         send: "Send",
         langToggle: "AR",
         clear: "Clear",
-        welcome: "Hi! I'm Tanky, your smart aquarium assistant. I can help you balance water, choose the right fish, and fix tank issues — ask me anything!",
+        welcome: "Hi! I'm Tanky, your smart aquarium assistant 🐠💧 Let's start — what do you want to talk about?",
         quick: ["🐠 Fish suggestions", "💧 Water quality test", "🧽 Cleaning tips", "🌿 Easy plants"]
       }
     };
@@ -338,30 +266,6 @@ body.dark #inputBar {
       } else {
         appendMsg(ui[lang].welcome, 'bot');
       }
-    }
-
-    function applyTheme() {
-  document.body.classList.add('dark');
-  localStorage.setItem('tanky_theme', 'dark');
-}
-
-    function applyLang() {
-      const t = ui[lang];
-      document.querySelector('#title span').textContent = t.title;
-      input.placeholder = t.placeholder;
-      sendBtn.textContent = t.send;
-      langBtn.textContent = t.langToggle;
-      clearBtn.textContent = t.clear;
-      document.dir = lang === 'ar' ? 'rtl' : 'ltr';
-      quickActionsDiv.innerHTML = '';
-      t.quick.forEach(q => {
-        const btn = document.createElement('div');
-        btn.className = 'quick-btn';
-        btn.textContent = q;
-        btn.onclick = () => !isBusy && handleMessage(q);
-        quickActionsDiv.appendChild(btn);
-      });
-      localStorage.setItem('tanky_lang', lang);
     }
 
     function appendMsg(text, who) {
@@ -381,21 +285,33 @@ body.dark #inputBar {
       saveChat();
     }
 
-    async function handleMessage(text, img = null) {
+    async function handleMessage(text) {
       if (!text || isBusy) return;
       isBusy = true;
       sendBtn.disabled = true;
       appendMsg(text, 'user');
+
+      // Show "Tanky is thinking"
+      const typingEl = document.createElement('div');
+      typingEl.className = 'msg bot';
+      typingEl.innerHTML = `
+        <div class="msg-content">
+          <span class="typing-dots"><span>.</span><span>.</span><span>.</span></span>
+        </div>`;
+      messagesDiv.appendChild(typingEl);
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
       try {
-        const body = img ? { messages: [{ role: 'user', content: text }], image: img } : { messages: [{ role: 'user', content: text }] };
         const r = await fetch('https://tanky-ai-assistant.onrender.com/tanky-chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(body)
+          body: JSON.stringify({ messages: [{ role: 'user', content: text }] })
         });
         const d = await r.json();
+        typingEl.remove();
         appendMsg(d.reply || '...', 'bot');
       } catch {
+        typingEl.remove();
         appendMsg(lang === 'ar' ? 'حدث خطأ في الاتصال' : 'Connection error', 'bot');
       } finally {
         isBusy = false;
@@ -403,34 +319,44 @@ body.dark #inputBar {
       }
     }
 
-    sendBtn.onclick = () => { const t = input.value.trim(); if (!t) return; input.value = ''; handleMessage(t); };
-    input.addEventListener('keypress', e => { if (e.key === 'Enter') { e.preventDefault(); sendBtn.click(); } });
-    langBtn.onclick = () => { lang = lang === 'ar' ? 'en' : 'ar'; applyLang(); loadChat(); };
-    clearBtn.onclick = () => { localStorage.removeItem('tanky_chat'); messagesDiv.innerHTML = ''; appendMsg(ui[lang].welcome, 'bot'); };
-    themeBtn.style.display = 'none'; // hide theme toggle completely
-isDark = true;
-applyTheme();
+    // Apply theme and language
+    document.body.classList.add('dark');
+    const t = ui[lang];
+    document.querySelector('#title span').textContent = t.title;
+    input.placeholder = t.placeholder;
+    sendBtn.textContent = t.send;
+    langBtn.textContent = t.langToggle;
+    clearBtn.textContent = t.clear;
+    document.dir = lang === 'ar' ? 'rtl' : 'ltr';
 
-    applyTheme();
-    applyLang();
+    // Language toggle
+    langBtn.onclick = () => {
+      lang = lang === 'ar' ? 'en' : 'ar';
+      localStorage.setItem('tanky_lang', lang);
+      location.reload();
+    };
+
+    clearBtn.onclick = () => {
+      localStorage.removeItem('tanky_chat');
+      messagesDiv.innerHTML = '';
+      appendMsg(ui[lang].welcome, 'bot');
+    };
+
+    sendBtn.onclick = () => {
+      const t = input.value.trim();
+      if (!t) return;
+      input.value = '';
+      handleMessage(t);
+    };
+
+    input.addEventListener('keypress', e => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        sendBtn.click();
+      }
+    });
+
     loadChat();
-
-  // --- Self Keep-Alive Ping for Render --- //
-const KEEP_ALIVE_URL = "https://tanky-ai-assistant.onrender.com/tanky-chat";
-
-// Ping every 10 minutes (600,000 ms)
-setInterval(() => {
-  fetch(KEEP_ALIVE_URL, { method: "GET" })
-    .then(() => console.log("✅ Tanky keep-alive ping sent"))
-    .catch(() => console.warn("⚠️ Keep-alive ping failed"));
-}, 600000); // 10 minutes
-
-// Also ping once immediately when the page fully loads
-window.addEventListener('load', () => {
-  fetch(KEEP_ALIVE_URL)
-    .then(() => console.log("🚀 Initial keep-alive ping sent"))
-    .catch(() => console.warn("⚠️ Initial keep-alive ping failed"));
-});
   </script>
 </body>
 </html>
