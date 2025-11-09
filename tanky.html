@@ -305,14 +305,6 @@
     const input = document.getElementById('text');
     const langBtn = document.getElementById('langBtn');
     const clearBtn = document.getElementById('clearBtn');
-    const backBtn = document.getElementById('backBtn');
-
-    // رجوع
-    backBtn.onclick = () => {
-      window.history.back();
-      // أو بدلها لو عايز يحوله لرابط رئيسي
-      // window.location.href = "https://mytankscape.com";
-    };
 
     // Auto-detect language
     let lang = localStorage.getItem('tanky_lang');
